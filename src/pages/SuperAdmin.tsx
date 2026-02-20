@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -6,7 +6,7 @@ import {
   LogOut, ChevronLeft, ShieldCheck, TrendingUp, TrendingDown, DollarSign,
   Activity, Ban, CheckCircle2, AlertTriangle, Plus, Search, MoreHorizontal,
   Eye, UserX, UserCheck, ArrowUpDown, Edit2, Trash2, Mail, Globe, Clock,
-  MoreVertical
+  MoreVertical,FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,7 @@ const superAdminMenu = [
   // { icon: CreditCard, label: "Subscriptions", path: "/super-admin/subscriptions" },
   { icon: Activity, label: "Analytics", path: "/super-admin/analytics" },
   { icon: Settings, label: "Settings", path: "/super-admin/settings" },
+  { icon: Mail, label: "Demo Inquiries", path: "/super-admin/demo-inquiries" },
 ];
 
 const SuperAdminSidebar = () => {
@@ -101,6 +102,7 @@ export default function SuperAdmin() {
     if (path.includes("/subscriptions")) return "subscriptions";
     if (path.includes("/analytics")) return "analytics";
     if (path.includes("/settings")) return "settings";
+    if (path.includes("/demo-inquiries")) return "demo";
     return "overview";
   };
 
@@ -119,7 +121,7 @@ export default function SuperAdmin() {
           {activeTab === "plans" && <PlansTab />}
           {activeTab === "analytics" && <AnalyticsTab />}
           {activeTab === "settings" && <SettingsTab />}
-
+{activeTab === "demo" && <DemoInquiriesTab />}
           {activeTab === "subscriptions" && (
             <div className="flex items-center justify-center h-96 text-gray-500">
               <div className="text-center">
@@ -717,6 +719,101 @@ function SettingsTab() {
           <Button onClick={handleSave} className="bg-cyan-600 hover:bg-cyan-500 w-full md:w-auto">Save Changes</Button>
         </div>
       </div>
+
+
+
+
+
+
+      
     </div>
+
+
+
+
+
   );
 };
+// ─── DEMO INQUIRIES TAB ───
+function DemoInquiriesTab() {
+  const { token } = useAuth();
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/super-admin/demo-inquiries",
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        if (res.data.success) {
+          setData(res.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching demo inquiries", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) fetchData();
+  }, [token]);
+
+  if (loading) {
+    return <div className="text-gray-400">Loading demo inquiries...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-foreground">Demo Inquiries</h2>
+        <p className="text-sm text-muted-foreground">
+          {data.length} total demo requests
+        </p>
+      </div>
+
+      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-900/50 text-gray-400">
+            <tr>
+              <th className="p-4">Name</th>
+              <th className="p-4">Email</th>
+              <th className="p-4">Phone</th>
+              <th className="p-4">Organisation</th>
+              <th className="p-4">Message</th>
+              <th className="p-4">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-800">
+            {data.map((item) => (
+              <tr key={item._id} className="hover:bg-cyan-500/5">
+                <td className="p-4 text-white">{item.name}</td>
+                <td className="p-4 text-gray-400">{item.email}</td>
+                <td className="p-4 text-gray-400">{item.phone}</td>
+                <td className="p-4 text-gray-400">
+                  {item.organisation || "-"}
+                </td>
+                <td className="p-4 text-gray-400 max-w-xs truncate">
+                  {item.message || "-"}
+                </td>
+                <td className="p-4 text-gray-500 text-xs">
+                  {new Date(item.createdAt).toLocaleString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {data.length === 0 && (
+          <div className="p-8 text-center text-gray-500">
+            No demo inquiries yet.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

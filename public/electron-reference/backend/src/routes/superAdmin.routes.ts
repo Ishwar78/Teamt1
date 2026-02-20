@@ -6,7 +6,7 @@ import { User } from '../models/User';
 import { Company } from '../models/Company';
 import { Plan } from '../models/Plan';
 import { AppError } from '../utils/errors';
-
+import { DemoInquiry } from "../models/DemoInquiry";
 const router = Router();
 
 /* ================= PLANS ================= */
@@ -275,6 +275,34 @@ router.put('/settings', authenticate, requireRole('super_admin'), async (req, re
   platformSettings = { ...platformSettings, ...req.body };
   res.json({ success: true, data: platformSettings });
 });
+/* =======================================================
+   GET DEMO INQUIRIES (SUPER ADMIN)
+======================================================= */
 
+/* =======================================================
+   GET DEMO INQUIRIES
+======================================================= */
+
+router.get(
+  "/demo-inquiries",
+  authenticate,
+  requireRole("super_admin"),
+  async (req, res) => {
+    try {
+      const data = await DemoInquiry.find().sort({ createdAt: -1 });
+
+      res.json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      console.error("Error fetching demo inquiries:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  }
+);
 
 export const superAdminRoutes = router;

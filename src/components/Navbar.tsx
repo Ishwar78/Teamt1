@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import BookDemoModal from "@/components/BookDemoModal";
 
 const features = [
   { label: "Time Tracker", href: "/features/time-tracker" },
@@ -20,75 +21,153 @@ const solutions = [
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openDemo, setOpenDemo] = useState(false); // ✅ sahi jagah
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
 
   if (isDashboard) return null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-bold text-primary-foreground text-sm">W</div>
-          <span className="text-lg font-bold text-foreground">WEBMOK</span>
-        </Link>
-
-        {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-6">
-          <NavDropdown label="Features" items={features} />
-          <NavDropdown label="Solutions" items={solutions} />
-          <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
-          <Link to="/download" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Download</Link>
-          <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-3">
-          <Link to="/admin/login">
-            <Button variant="ghost" size="sm">Login</Button>
-          </Link>
-          <Link to="/admin/login">
-            <Button size="sm">Book Demo</Button>
-          </Link>
-        </div>
-
-        <button className="lg:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass border-t border-border"
-          >
-            <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
-              <Link to="/#features" className="text-sm text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>Features</Link>
-              <Link to="/pricing" className="text-sm text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>Pricing</Link>
-              <Link to="/download" className="text-sm text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>Download</Link>
-              <Link to="/contact" className="text-sm text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>Contact</Link>
-              <div className="flex gap-2 pt-2">
-                <Link to="/admin/login" className="flex-1"><Button variant="ghost" className="w-full" size="sm">Login</Button></Link>
-                <Link to="/admin/login" className="flex-1"><Button className="w-full" size="sm">Book Demo</Button></Link>
-              </div>
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 glass">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-bold text-primary-foreground text-sm">
+              W
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+            <span className="text-lg font-bold text-foreground">WEBMOK</span>
+          </Link>
+
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center gap-6">
+            <NavDropdown label="Features" items={features} />
+            <NavDropdown label="Solutions" items={solutions} />
+            <Link
+              to="/pricing"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
+              to="/download"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Download
+            </Link>
+            <Link
+              to="/contact"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact
+            </Link>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-3">
+            <Link to="/admin/login">
+              <Button variant="ghost" size="sm">
+                Login
+              </Button>
+            </Link>
+
+            {/* ✅ Book Demo Modal Trigger */}
+            <Button size="sm" onClick={() => setOpenDemo(true)}>
+              Book Demo
+            </Button>
+          </div>
+
+          <button
+            className="lg:hidden text-foreground"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden glass border-t border-border"
+            >
+              <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
+                <Link
+                  to="/pricing"
+                  className="text-sm text-muted-foreground py-2"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Pricing
+                </Link>
+                <Link
+                  to="/download"
+                  className="text-sm text-muted-foreground py-2"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Download
+                </Link>
+                <Link
+                  to="/contact"
+                  className="text-sm text-muted-foreground py-2"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Contact
+                </Link>
+
+                <div className="flex gap-2 pt-2">
+                  <Link to="/admin/login" className="flex-1">
+                    <Button
+                      variant="ghost"
+                      className="w-full"
+                      size="sm"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+
+                  {/* ✅ Mobile Book Demo */}
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setOpenDemo(true);
+                    }}
+                  >
+                    Book Demo
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {/* ✅ Modal YAHAN HOGA (NavDropdown ke andar nahi) */}
+      <BookDemoModal open={openDemo} setOpen={setOpenDemo} />
+    </>
   );
 };
 
-const NavDropdown = ({ label, items }: { label: string; items: { label: string; href: string }[] }) => {
+const NavDropdown = ({
+  label,
+  items,
+}: {
+  label: string;
+  items: { label: string; href: string }[];
+}) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
       <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
         {label} <ChevronDown size={14} />
       </button>
+
       <AnimatePresence>
         {open && (
           <motion.div

@@ -42,15 +42,46 @@ ipcMain.on('activity-state', (event, data) => {
 async function getActiveWindow() {
   try {
     const win = await activeWin();
+    let url = win?.url || '';
+    const appName = win?.owner?.name || '';
+    let title = win?.title || '';
+
+    // Fallback for Windows: active-win doesn't always return URL natively
+    if (!url && ['Google Chrome', 'Microsoft Edge', 'Brave', 'Firefox', 'Opera'].includes(appName)) {
+      if (title) {
+        // Clean up the browser suffix to use the page title as "URL"
+        let cleanTitle = title;
+        cleanTitle = cleanTitle.replace(/\s*-\s*Google Chrome$/, '');
+        cleanTitle = cleanTitle.replace(/\s*-\s*Microsoft\u200b Edge$/, '');
+        cleanTitle = cleanTitle.replace(/\s*-\s*Microsoft Edge$/, '');
+        cleanTitle = cleanTitle.replace(/\s*-\s*Brave$/, '');
+        cleanTitle = cleanTitle.replace(/\s*-\s*Mozilla Firefox$/, '');
+        cleanTitle = cleanTitle.replace(/\s*-\s*Opera$/, '');
+        cleanTitle = cleanTitle.replace(/\s*-\s*Profile \d+$/, ''); // E.g., Profile 1
+        cleanTitle = cleanTitle.replace(/\s*-\s*Personal$/, '');
+        url = cleanTitle;
+      }
+    }
+
+    // Attempt to parse out likely actual domains from the title if they look like a URL
+    if (url && !url.includes('://')) {
+      const urlMatch = url.match(/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      if (urlMatch) {
+        // We keep the readable title but it has a domain in it, or we could just leave it.
+        // Leaving as cleanTitle is usually better for readable names in the dashboard.
+      }
+    }
+
     return {
-      title: win?.title || '',
-      app: win?.owner?.name || '',
-      url: win?.url || ''
+      title: title,
+      app: appName,
+      url: url
     };
   } catch {
     return { title: '', app: '', url: '' };
   }
 }
+
 
 /* ================= ACTIVITY ================= */
 

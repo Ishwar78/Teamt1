@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { Plan } from '../models/Plan';
-
+import { DemoInquiry } from "../models/DemoInquiry";
 const router = Router();
 
 /* =======================================================
@@ -91,6 +91,32 @@ router.get('/agent/version', (_req: Request, res: Response) => {
         success: true,
         version: AGENT_VERSION
     });
+});
+
+
+router.post("/book-demo", async (req, res, next) => {
+  try {
+    const { name, email, phone, organisation, message } = req.body;
+
+    if (!name || !email || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email and phone are required",
+      });
+    }
+
+    await DemoInquiry.create({
+      name,
+      email,
+      phone,
+      organisation,
+      message,
+    });
+
+    res.json({ success: true, message: "Demo booked successfully" });
+  } catch (err) {
+    next(err);
+  }
 });
 
 export const publicRoutes = router;

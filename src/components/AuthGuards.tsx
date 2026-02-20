@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -10,7 +10,9 @@ export const SuperAdminAuthGuard = ({
   children: ReactNode;
 }) => {
   const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
+  // ⏳ Wait until auth restore completes
   if (loading) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -19,10 +21,18 @@ export const SuperAdminAuthGuard = ({
     );
   }
 
+  // 🚫 Not logged in
   if (!isAuthenticated || !user) {
-    return <Navigate to="/super/admin/login" replace />;
+    return (
+      <Navigate
+        to="/super/admin/login"
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
+  // 🚫 Wrong role trying to access super admin
   if (user.role !== "super_admin") {
     return <Navigate to="/admin/login" replace />;
   }
@@ -37,7 +47,9 @@ export const CompanyAdminAuthGuard = ({
   children: ReactNode;
 }) => {
   const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
+  // ⏳ Wait for auth restore
   if (loading) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -46,16 +58,23 @@ export const CompanyAdminAuthGuard = ({
     );
   }
 
+  // 🚫 Not logged in
   if (!isAuthenticated || !user) {
-    return <Navigate to="/admin/login" replace />;
+    return (
+      <Navigate
+        to="/admin/login"
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
-  // Block super admin here
+  // 🚫 Block super admin from company dashboard
   if (user.role === "super_admin") {
     return <Navigate to="/super-admin" replace />;
   }
 
-  // 🔥 FIXED FIELD NAME
+  // 🚫 Missing company binding
   if (!user.company_id) {
     return <Navigate to="/admin/login" replace />;
   }
