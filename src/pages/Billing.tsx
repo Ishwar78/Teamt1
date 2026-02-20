@@ -175,6 +175,69 @@ const Billing = () => {
     setCancelDialog(false);
   };
 
+  const handleUpgrade = async (plan: Plan) => {
+    try {
+      // 1. Get Razorpay Key
+      const keyRes = await apiFetch('/api/payment/key', token);
+      const { key } = keyRes;
+
+      if (!key) {
+        toast({ title: "Error", description: "Payment configuration missing", variant: "destructive" });
+        return;
+      }
+
+      // 2. Create Order
+      const orderRes = await apiFetch('/api/payment/create-order', token, {
+        method: 'POST',
+        body: JSON.stringify({ planId: plan.id })
+      });
+      const { order } = orderRes;
+
+      // 3. Initialize Razorpay
+      const options = {
+        key: key,
+        amount: order.amount,
+        currency: order.currency,
+        name: "TeamTracker",
+        description: `Upgrade to ${plan.name}`,
+        order_id: order.id,
+        handler: async function (response: any) {
+          try {
+            // 4. Verify Payment
+            await apiFetch('/api/payment/verify', token, {
+              method: 'POST',
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+
+            toast({ title: "Success", description: `Upgraded to ${plan.name} successfully!` });
+            setUpgradeDialog(null);
+            fetchCompany(); // Refresh data
+          } catch (err) {
+            toast({ title: "Error", description: "Payment verification failed", variant: "destructive" });
+          }
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+        },
+        theme: {
+          color: "#00f5d4"
+        }
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.open();
+
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Error", description: "Failed to initiate payment", variant: "destructive" });
+    }
+  };
+
   return (
     <DashboardLayout>
       <PageGuard permission="manage_billing">
@@ -424,7 +487,13 @@ const Billing = () => {
                 <Button variant="outline" onClick={() => setUpgradeDialog(null)}>Cancel</Button>
                 <Button
                   variant={upgradeDialog && isUpgrade(upgradeDialog) ? "default" : "secondary"}
-                  onClick={handlePlanChange}
+                  onClick={() => {
+                    if (upgradeDialog && isUpgrade(upgradeDialog)) {
+                      handleUpgrade(upgradeDialog);
+                    } else {
+                      handlePlanChange();
+                    }
+                  }}
                   disabled={upgradeDialog ? isDowngrade(upgradeDialog) && currentPlan!.currentUsers > upgradeDialog.users : false}
                 >
                   {upgradeDialog && isUpgrade(upgradeDialog) ? "Confirm Upgrade" : "Confirm Downgrade"}
@@ -469,3 +538,11 @@ const Billing = () => {
 };
 
 export default Billing;
+// Add Razorpay type definition
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+// ... existing code ...

@@ -19,8 +19,15 @@ interface AttendanceData {
   finishTime: string | null;
   workHours: string;
   idleHours: string;
-  hourlyData: { [hour: string]: string }; // "Active", "Idle", "Absent" etc.
+  hourlyData: { [hour: string]: string };
+  timeline?: {
+    start: string;
+    end: string;
+    type: string;
+    duration: string;
+  }[];
 }
+
 
 // Mock hourly columns like in the reference screenshot
 
@@ -100,6 +107,7 @@ const Attendance = () => {
       const query = new URLSearchParams({
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
+        detailed: viewMode === 'day' ? 'true' : 'false',
         ...(selectedUser && selectedUser !== "all" && { userId: selectedUser })
       }).toString();
 
@@ -110,6 +118,11 @@ const Attendance = () => {
         date: format(new Date(record.date), "dd MMM yyyy EEE"),
         inTime: record.inTime ? format(new Date(record.inTime), "hh:mm a") : "-",
         finishTime: record.finishTime ? format(new Date(record.finishTime), "hh:mm a") : "-",
+        timeline: record.timeline?.map((t: any) => ({
+          ...t,
+          start: format(new Date(t.start), "hh:mm a"),
+          end: format(new Date(t.end), "hh:mm a"),
+        })) || []
       }));
 
       // Fill in missing days if showing a range/week
@@ -262,87 +275,163 @@ const Attendance = () => {
             </div>
           </div>
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-3 gap-4">
-            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-2">Time Spent</p>
-                  <p className="text-3xl font-bold text-blue-500">{stats.timeSpent}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-2">Total Working Time</p>
-                  <p className="text-3xl font-bold text-green-500">{stats.workingTime}</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-2">Idle Time</p>
-                  <p className="text-3xl font-bold text-yellow-500">{stats.idleTime}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Attendance Table with Hourly Breakdown */}
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-primary/5">
-                      <TableHead className="font-semibold">Date</TableHead>
-                      <TableHead className="font-semibold text-center">In Time</TableHead>
-                      <TableHead className="font-semibold text-center">Finish</TableHead>
-                      <TableHead className="font-semibold text-center">Work</TableHead>
-                      <TableHead className="font-semibold text-center">Idle</TableHead>
-                      {HOURLY_COLUMNS.map((hour) => (
-                        <TableHead key={hour} className="font-semibold text-center text-xs">
-                          {hour}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {attendanceData.map((record, idx) => (
-                      <TableRow key={idx} className="hover:bg-muted/50">
-                        <TableCell className="font-medium">{record.date}</TableCell>
-                        <TableCell className="text-center text-sm">
-                          {record.inTime || "-"}
-                        </TableCell>
-                        <TableCell className="text-center text-sm">
-                          {record.finishTime || "-"}
-                        </TableCell>
-                        <TableCell className="text-center text-sm font-mono">
-                          {record.workHours}
-                        </TableCell>
-                        <TableCell className="text-center text-sm font-mono">
-                          {record.idleHours}
-                        </TableCell>
-                        {HOURLY_COLUMNS.map((hour) => (
-                          <TableCell key={hour} className="text-center p-1">
-                            <div
-                              className={`rounded px-2 py-1 text-xs font-medium ${getHourColor(
-                                record.hourlyData[hour]
-                              )}`}
-                            >
-                              {record.hourlyData[hour] === "Absent" ? "Absent" : ""}
-                            </div>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+          {/* Detailed Day View */}
+          {viewMode === 'day' && attendanceData.length > 0 ? (
+            <div className="space-y-6">
+              {/* Day Stats Cards */}
+              <div className="grid grid-cols-4 gap-4">
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Start Time</p>
+                    <p className="text-2xl font-bold text-primary">{attendanceData[0]?.inTime || '-'}</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-blue-500/5 border-blue-500/20">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Work Duration</p>
+                    <p className="text-2xl font-bold text-blue-500">{attendanceData[0]?.workHours}</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-yellow-500/5 border-yellow-500/20">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Offline Duration</p>
+                    <p className="text-2xl font-bold text-yellow-500">{attendanceData[0]?.idleHours}</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-green-500/5 border-green-500/20">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Total Duration</p>
+                    {/* Calculate total duration roughly */}
+                    <p className="text-2xl font-bold text-green-500">{stats.timeSpent}</p>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Detailed Timeline Table */}
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-primary/70 hover:bg-primary/80">
+                        <TableHead className="text-white font-semibold w-1/4">Start</TableHead>
+                        <TableHead className="text-white font-semibold w-1/4">End</TableHead>
+                        <TableHead className="text-white font-semibold w-1/4">Type</TableHead>
+                        <TableHead className="text-white font-semibold w-1/4">Duration</TableHead>
+                        <TableHead className="text-white font-semibold">Reason</TableHead>
+                        <TableHead className="text-white font-semibold">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {attendanceData[0]?.timeline?.map((segment, idx) => (
+                        <TableRow key={idx} className="hover:bg-muted/50 border-b border-border/50">
+                          <TableCell className="text-muted-foreground">{segment.start}</TableCell>
+                          <TableCell className="text-muted-foreground">{segment.end}</TableCell>
+                          <TableCell className={segment.type === 'Work' ? "text-blue-500" : "text-yellow-500"}>
+                            {segment.type}
+                          </TableCell>
+                          <TableCell>{segment.duration}</TableCell>
+                          <TableCell></TableCell>
+                          <TableCell></TableCell>
+                        </TableRow>
+                      )) || (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                              No activity recorded for this day.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            // Standard View for Week/Month
+            <>
+              {/* Summary Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
+                  <CardContent className="p-6">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">Time Spent</p>
+                      <p className="text-3xl font-bold text-blue-500">{stats.timeSpent}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
+                  <CardContent className="p-6">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">Total Working Time</p>
+                      <p className="text-3xl font-bold text-green-500">{stats.workingTime}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20">
+                  <CardContent className="p-6">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-2">Idle Time</p>
+                      <p className="text-3xl font-bold text-yellow-500">{stats.idleTime}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Attendance Table with Hourly Breakdown */}
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-primary/5">
+                          <TableHead className="font-semibold">Date</TableHead>
+                          <TableHead className="font-semibold text-center">In Time</TableHead>
+                          <TableHead className="font-semibold text-center">Finish</TableHead>
+                          <TableHead className="font-semibold text-center">Work</TableHead>
+                          <TableHead className="font-semibold text-center">Idle</TableHead>
+                          {HOURLY_COLUMNS.map((hour) => (
+                            <TableHead key={hour} className="font-semibold text-center text-xs">
+                              {hour}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {attendanceData.map((record, idx) => (
+                          <TableRow key={idx} className="hover:bg-muted/50">
+                            <TableCell className="font-medium">{record.date}</TableCell>
+                            <TableCell className="text-center text-sm">
+                              {record.inTime || "-"}
+                            </TableCell>
+                            <TableCell className="text-center text-sm">
+                              {record.finishTime || "-"}
+                            </TableCell>
+                            <TableCell className="text-center text-sm font-mono">
+                              {record.workHours}
+                            </TableCell>
+                            <TableCell className="text-center text-sm font-mono">
+                              {record.idleHours}
+                            </TableCell>
+                            {HOURLY_COLUMNS.map((hour) => (
+                              <TableCell key={hour} className="text-center p-1">
+                                <div
+                                  className={`rounded px-2 py-1 text-xs font-medium ${getHourColor(
+                                    record.hourlyData[hour]
+                                  )}`}
+                                >
+                                  {record.hourlyData[hour] === "Absent" ? "Absent" : ""}
+                                </div>
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
         </div>
       </PageGuard>
     </DashboardLayout>

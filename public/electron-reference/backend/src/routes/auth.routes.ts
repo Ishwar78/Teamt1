@@ -12,6 +12,7 @@ import { Company } from "../models/Company";
 import { Invitation } from "../models/Invitation";
 import { env } from "../config/env";
 import { AppError } from "../utils/errors";
+import { Session } from "../models/Session";
 
 export const authRoutes = Router();
 
@@ -120,6 +121,38 @@ authRoutes.post(
 
       user.last_login = new Date();
       await user.save();
+
+      // AUTO-START SESSION (IN TIME)
+      if (user.company_id) {
+        // Check if there's already an active or paused session
+        const existingSession = await Session.findOne({
+          user_id: user._id,
+          company_id: user.company_id,
+          status: { $in: ['active', 'paused'] }
+        });
+
+        if (!existingSession) {
+          // Create new session to mark "In Time"
+          await Session.create({
+            user_id: user._id,
+            company_id: user.company_id,
+            device_id: device_id,
+            start_time: new Date(),
+            status: 'active',
+            events: [
+              { type: 'start', timestamp: new Date() }
+            ],
+            summary: {
+              total_duration: 0,
+              active_duration: 0,
+              idle_duration: 0,
+              pause_duration: 0,
+              screenshots_count: 0,
+              activity_score: 0
+            }
+          });
+        }
+      }
 
       const company = user.company_id
         ? await Company.findById(user.company_id).lean()

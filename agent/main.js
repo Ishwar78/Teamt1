@@ -44,10 +44,11 @@ async function getActiveWindow() {
     const win = await activeWin();
     return {
       title: win?.title || '',
-      app: win?.owner?.name || ''
+      app: win?.owner?.name || '',
+      url: win?.url || ''
     };
   } catch {
-    return { title: '', app: '' };
+    return { title: '', app: '', url: '' };
   }
 }
 
@@ -75,7 +76,7 @@ async function sendActivityLog() {
         active_window: {
           title: windowInfo.title,
           app_name: windowInfo.app,
-          url: "",
+          url: windowInfo.url || "",
           category: "Uncategorized"
         }
       }]

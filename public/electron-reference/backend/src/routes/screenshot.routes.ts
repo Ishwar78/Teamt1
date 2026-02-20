@@ -9,7 +9,6 @@ import { Screenshot } from "../models/Screenshot";
 import { AppError } from "../utils/errors";
 
 const router = Router();
-router.use(authenticate, enforceTenant);
 
 /* ================= LOCAL UPLOAD FOLDER ================= */
 
@@ -22,13 +21,9 @@ if (!fs.existsSync(uploadDir)) {
 /* ================= MULTER CONFIG ================= */
 
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (_req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  },
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) =>
+    cb(null, Date.now() + "-" + file.originalname),
 });
 
 const upload = multer({
@@ -38,46 +33,54 @@ const upload = multer({
 
 /* ================= AGENT UPLOAD ================= */
 
-router.post("/", upload.single("file"), async (req, res, next) => {
-  try {
-    if (!req.file) throw new AppError("No file uploaded", 400);
-    if (!req.body.session_id)
-      throw new AppError("Missing session_id", 400);
+router.post(
+  "/",
+  authenticate,
+  enforceTenant,
+  upload.single("file"),
+  async (req, res, next) => {
+    try {
+      if (!req.file) throw new AppError("No file uploaded", 400);
+      if (!req.body.session_id)
+        throw new AppError("Missing session_id", 400);
 
-    const screenshot = await Screenshot.create({
-      user_id: req.auth!.user_id,
-      company_id: req.auth!.company_id,
-      session_id: req.body.session_id,
-      timestamp: req.body.timestamp
-        ? new Date(req.body.timestamp)
-        : new Date(),
-      s3_key: req.file.filename,
-      file_size: req.file.size,
-      resolution: {
-        width: Number(req.body.resolution_width || 1280),
-        height: Number(req.body.resolution_height || 720),
-      },
-      activity_score: Number(req.body.activity_score || 0),
-      active_window: {
-        title: req.body.window_title || "",
-        app_name: req.body.app_name || "",
-      },
-      blurred: false,
-    });
+      const screenshot = await Screenshot.create({
+        user_id: req.auth!.user_id,
+        company_id: req.auth!.company_id,
+        session_id: req.body.session_id,
+        timestamp: req.body.timestamp
+          ? new Date(req.body.timestamp)
+          : new Date(),
+        s3_key: req.file.filename,
+        file_size: req.file.size,
+        resolution: {
+          width: Number(req.body.resolution_width || 1280),
+          height: Number(req.body.resolution_height || 720),
+        },
+        activity_score: Number(req.body.activity_score || 0),
+        active_window: {
+          title: req.body.window_title || "",
+          app_name: req.body.app_name || "",
+        },
+        blurred: false,
+      });
 
-    res.status(201).json({
-      success: true,
-      id: screenshot._id,
-    });
-  } catch (err) {
-    next(err);
+      res.status(201).json({
+        success: true,
+        id: screenshot._id,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 /* ================= ADMIN LIST ================= */
 
 router.get(
   "/:userId",
+  authenticate,
+  enforceTenant,
   requireRole("company_admin", "sub_admin"),
   async (req, res, next) => {
     try {
@@ -95,24 +98,47 @@ router.get(
   }
 );
 
-/* ================= DOWNLOAD/VIEW ================= */
+/* ================= VIEW (NO AUTH MIDDLEWARE) ================= */
 
-router.get("/download/:id", async (req, res, next) => {
+router.get("/view/:id", async (req, res, next) => {
   try {
     const shot = await Screenshot.findById(req.params.id);
     if (!shot) throw new AppError("Screenshot not found", 404);
-
-    // Ensure they belong to the same company
-    if (shot.company_id.toString() !== req.auth!.company_id.toString()) {
-      throw new AppError("Access denied", 403);
-    }
 
     const filePath = path.join(uploadDir, shot.s3_key);
     if (!fs.existsSync(filePath)) {
       throw new AppError("File not found on server", 404);
     }
 
-    res.sendFile(filePath);
+    // Detect extension
+    const ext = path.extname(filePath).toLowerCase();
+
+    let contentType = "image/png";
+    if (ext === ".jpg" || ext === ".jpeg") contentType = "image/jpeg";
+    if (ext === ".webp") contentType = "image/webp";
+
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", "inline");
+
+    const stream = fs.createReadStream(filePath);
+    stream.pipe(res);
+  } catch (err) {
+    next(err);
+  }
+});
+/* ================= DOWNLOAD ================= */
+
+router.get("/download/:id", async (req, res, next) => {
+  try {
+    const shot = await Screenshot.findById(req.params.id);
+    if (!shot) throw new AppError("Screenshot not found", 404);
+
+    const filePath = path.join(uploadDir, shot.s3_key);
+    if (!fs.existsSync(filePath)) {
+      throw new AppError("File not found on server", 404);
+    }
+
+    res.download(filePath, `screenshot-${shot._id}.png`);
   } catch (err) {
     next(err);
   }

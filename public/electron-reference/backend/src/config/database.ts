@@ -9,6 +9,7 @@ export async function connectDatabase(): Promise<void> {
       minPoolSize: 5,
       serverSelectionTimeoutMS: 5000,
       heartbeatFrequencyMS: 10000,
+      family: 4, // Force IPv4 to avoid ECONNREFUSED on some networks
     });
     logger.info('MongoDB connected');
   } catch (error) {

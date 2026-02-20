@@ -173,7 +173,6 @@ const TimeLogs = () => {
                 <div>Loading...</div>
               ) : (
 
-                /* 🔥 ONLY THIS AREA SCROLLS */
                 <div className="overflow-x-auto h-full">
 
                   <div style={{ width: TIMELINE_WIDTH }}>
@@ -184,12 +183,18 @@ const TimeLogs = () => {
                         const left = (i / 24) * TIMELINE_WIDTH;
 
                         return (
-                          <div
-                            key={i}
-                            className="absolute text-xs text-muted-foreground"
-                            style={{ left }}
-                          >
-                            {format(new Date().setHours(i, 0, 0, 0), "h a")}
+                          <div key={i}>
+                            <div
+                              className="absolute text-xs text-muted-foreground"
+                              style={{ left }}
+                            >
+                              {format(new Date().setHours(i, 0, 0, 0), "h a")}
+                            </div>
+
+                            <div
+                              className="absolute top-6 bottom-0 w-px bg-border"
+                              style={{ left }}
+                            />
                           </div>
                         );
                       })}
@@ -197,10 +202,23 @@ const TimeLogs = () => {
 
                     {/* Activity Bar */}
                     <div className="relative h-20 bg-secondary/20 rounded border border-border">
+
+                      {Array.from({ length: 24 }).map((_, i) => {
+                        const left = (i / 24) * TIMELINE_WIDTH;
+
+                        return (
+                          <div
+                            key={i}
+                            className="absolute top-0 bottom-0 w-px bg-border/40"
+                            style={{ left }}
+                          />
+                        );
+                      })}
+
                       {timelineData.map(item => (
                         <div
                           key={item.id}
-                          className={`absolute top-4 h-12 rounded-sm group ${
+                          className={`absolute top-4 h-12 rounded-sm group cursor-pointer ${
                             item.idle
                               ? "bg-red-500/80 hover:bg-red-400"
                               : "bg-green-500/80 hover:bg-green-400"
@@ -210,16 +228,19 @@ const TimeLogs = () => {
                             width: item.width
                           }}
                         >
-                          <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded">
-                            {item.startStr} - {item.endStr}
+                          {/* Hover Tooltip */}
+                          <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                            <div className="px-3 py-1 bg-black text-white text-xs rounded shadow-lg whitespace-nowrap">
+                              {item.startStr} - {item.endStr}
+                            </div>
                           </div>
                         </div>
                       ))}
+
                     </div>
 
                   </div>
                 </div>
-
               )}
 
               {/* Legend */}

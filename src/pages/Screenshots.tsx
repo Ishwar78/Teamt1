@@ -2,26 +2,40 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiFetch } from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Camera, Download, Users, Calendar } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { format } from "date-fns";
 
+const API_BASE = "http://localhost:5000";
+
 const Screenshots = () => {
   const { token, user } = useAuth();
   const { can, role } = usePermissions();
-  const isAdmin = can("manage_team") || role === "company_admin" || role === "sub_admin";
+  const isAdmin =
+    can("manage_team") ||
+    role === "company_admin" ||
+    role === "sub_admin";
 
   const [screenshots, setScreenshots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
 
+  /* ================= INITIAL LOAD ================= */
+
   useEffect(() => {
     if (token && user?.id) {
       setSelectedUser(user.id);
+
       if (isAdmin) {
         fetchTeamMembers();
       } else {
@@ -30,16 +44,21 @@ const Screenshots = () => {
     }
   }, [token, user]);
 
+  /* ================= USER CHANGE ================= */
+
   useEffect(() => {
     if (selectedUser) {
       fetchScreenshots(selectedUser);
     }
   }, [selectedUser]);
 
+  /* ================= FETCH TEAM ================= */
+
   const fetchTeamMembers = async () => {
     try {
       const data = await apiFetch("/api/company/users", token);
       setTeamMembers(data.users || []);
+
       if (data.users?.length > 0) {
         setSelectedUser(data.users[0]._id);
       }
@@ -48,10 +67,15 @@ const Screenshots = () => {
     }
   };
 
+  /* ================= FETCH SCREENSHOTS ================= */
+
   const fetchScreenshots = async (userId: string) => {
     setLoading(true);
     try {
-      const data = await apiFetch(`/api/agent/screenshots/${userId}`, token);
+      const data = await apiFetch(
+        `/api/agent/screenshots/${userId}`,
+        token
+      );
       setScreenshots(data.screenshots || []);
     } catch (err) {
       console.error(err);
@@ -61,12 +85,14 @@ const Screenshots = () => {
     }
   };
 
-  const selectedEmployee = teamMembers.find(m => m._id === selectedUser);
+  const selectedEmployee = teamMembers.find(
+    (m) => m._id === selectedUser
+  );
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
+        {/* ================= HEADER ================= */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -78,7 +104,7 @@ const Screenshots = () => {
             </p>
           </div>
 
-          {/* Employee Selector (Admin Only) */}
+          {/* Admin Selector */}
           {isAdmin && teamMembers.length > 0 && (
             <Select value={selectedUser} onValueChange={setSelectedUser}>
               <SelectTrigger className="w-64 bg-card border-border">
@@ -87,7 +113,10 @@ const Screenshots = () => {
               </SelectTrigger>
               <SelectContent>
                 {teamMembers.map((member) => (
-                  <SelectItem key={member._id} value={member._id}>
+                  <SelectItem
+                    key={member._id}
+                    value={member._id}
+                  >
                     {member.name} ({member.email})
                   </SelectItem>
                 ))}
@@ -96,7 +125,7 @@ const Screenshots = () => {
           )}
         </div>
 
-        {/* Stats Card */}
+        {/* ================= STATS CARD ================= */}
         {selectedEmployee && (
           <Card>
             <CardContent className="p-4">
@@ -106,20 +135,28 @@ const Screenshots = () => {
                     <Camera className="text-primary" size={20} />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">{selectedEmployee.name}</p>
-                    <p className="text-sm text-muted-foreground">{selectedEmployee.email}</p>
+                    <p className="font-semibold text-foreground">
+                      {selectedEmployee.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedEmployee.email}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-foreground">{screenshots.length}</p>
-                  <p className="text-xs text-muted-foreground">Total Screenshots</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {screenshots.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Total Screenshots
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* Screenshots Grid */}
+        {/* ================= GRID ================= */}
         {loading ? (
           <div className="flex h-64 items-center justify-center text-muted-foreground">
             Loading screenshots...
@@ -127,8 +164,13 @@ const Screenshots = () => {
         ) : screenshots.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <Camera className="mx-auto text-muted-foreground mb-4" size={48} />
-              <p className="text-muted-foreground">No screenshots available</p>
+              <Camera
+                className="mx-auto text-muted-foreground mb-4"
+                size={48}
+              />
+              <p className="text-muted-foreground">
+                No screenshots available
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -139,33 +181,43 @@ const Screenshots = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Calendar size={12} />
-                      {shot.timestamp ? format(new Date(shot.timestamp), "MMM dd, yyyy HH:mm") : "Unknown"}
+                      {shot.timestamp
+                        ? format(
+                            new Date(shot.timestamp),
+                            "MMM dd, yyyy HH:mm"
+                          )
+                        : "Unknown"}
                     </div>
+
+                    {/* DOWNLOAD BUTTON */}
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const link = document.createElement("a");
-                        link.href = `http://localhost:5000/api/agent/screenshots/download/${shot._id}?token=${token}`;
-                        link.download = `screenshot-${shot._id}.png`;
-                        link.click();
+                    window.open(
+  `${API_BASE}/api/agent/screenshots/download/${shot._id}`,
+  "_blank"
+);
                       }}
                     >
                       <Download size={14} />
                     </Button>
                   </div>
                 </CardHeader>
+
+                {/* IMAGE PREVIEW FIXED */}
                 <CardContent className="p-0">
-                  <img
-                    src={`http://localhost:5000/api/agent/screenshots/download/${shot._id}?token=${token}`}
-                    className="w-full h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                    alt="Screenshot"
-                    onClick={() => {
+                 <img
+  src={`${API_BASE}/api/agent/screenshots/view/${shot._id}`}
+  className="w-full h-56 object-cover"
+  alt="Screenshot"
+
+                    onClick={() =>
                       window.open(
-                        `http://localhost:5000/api/agent/screenshots/download/${shot._id}?token=${token}`,
+                        `${API_BASE}/api/agent/screenshots/view/${shot._id}`,
                         "_blank"
-                      );
-                    }}
+                      )
+                    }
                   />
                 </CardContent>
               </Card>

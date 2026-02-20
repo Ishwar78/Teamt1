@@ -6,6 +6,11 @@ import { Company } from '../models/Company';
 
 const router = Router();
 
+/* ================= GET KEY ================= */
+router.get('/key', (req, res) => {
+  res.json({ key: process.env.RAZORPAY_KEY_ID || '' });
+});
+
 /* ================= CREATE ORDER ================= */
 
 router.post('/create-order', async (req, res, next) => {

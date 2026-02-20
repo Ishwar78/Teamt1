@@ -98,7 +98,7 @@ const DashboardSidebar = () => {
 
       </nav>
 
-      {!collapsed && <RoleSwitcher />}
+      {/* {!collapsed && <RoleSwitcher />} */}
 
       <div className="p-2 border-t border-border">
         <Link to="/admin/login" onClick={logout} className="flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
