@@ -5,7 +5,7 @@ const FormData = require('form-data');
 const activeWin = require('active-win');
 
 let mainWindow;
-let screenshotInterval = null;
+let screenshotTimeout = null;
 let activityInterval = null;
 let token = null;
 let sessionId = null;
@@ -181,7 +181,21 @@ ipcMain.on('start-session', async (event, data) => {
 
     await captureScreenshot();
 
-    screenshotInterval = setInterval(captureScreenshot, 5 * 60 * 1000);
+    function scheduleNextScreenshot() {
+      if (!sessionId) return; // Stop if session ended
+
+      // Random time between 2 and 8 minutes
+      const minMinutes = 2;
+      const maxMinutes = 8;
+      const randomDelay = Math.floor(Math.random() * (maxMinutes - minMinutes + 1) + minMinutes) * 60 * 1000;
+
+      screenshotTimeout = setTimeout(async () => {
+        await captureScreenshot();
+        scheduleNextScreenshot();
+      }, randomDelay);
+    }
+    scheduleNextScreenshot();
+
     activityInterval = setInterval(sendActivityLog, 10000);
 
   } catch (err) {
@@ -195,7 +209,7 @@ ipcMain.on('end-session', async () => {
   try {
     if (!sessionId) return;
 
-    clearInterval(screenshotInterval);
+    clearTimeout(screenshotTimeout);
     clearInterval(activityInterval);
 
     await axios.put(`${API_BASE}/api/sessions/${sessionId}/end`, {}, {
@@ -218,7 +232,7 @@ ipcMain.on('agent-logout', async () => {
   try {
 
     if (sessionId) {
-      clearInterval(screenshotInterval);
+      clearTimeout(screenshotTimeout);
       clearInterval(activityInterval);
 
       await axios.put(`${API_BASE}/api/sessions/${sessionId}/end`, {}, {
@@ -231,7 +245,7 @@ ipcMain.on('agent-logout', async () => {
     currentIdle = false;
     currentActivityScore = 100;
 
-    screenshotInterval = null;
+    screenshotTimeout = null;
     activityInterval = null;
 
     console.log("Agent fully logged out");
