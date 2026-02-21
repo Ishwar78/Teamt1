@@ -98,10 +98,10 @@ const TimeLogs = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex h-[calc(100vh-100px)] gap-6 overflow-hidden">
+      <div className="flex flex-col md:flex-row h-[calc(100vh-100px)] md:gap-6 overflow-hidden">
 
         {/* Sidebar */}
-        <Card className="w-80 flex flex-col h-full">
+        <Card className="w-full md:w-80 flex flex-col h-1/3 md:h-full shrink-0 mb-4 md:mb-0">
           <CardHeader>
             <CardTitle>Team Members</CardTitle>
             <Input
@@ -117,9 +117,8 @@ const TimeLogs = () => {
               <div
                 key={u._id}
                 onClick={() => setSelectedUserId(u._id)}
-                className={`flex items-center gap-3 p-3 rounded cursor-pointer ${
-                  selectedUserId === u._id ? "bg-primary/10" : "hover:bg-secondary/50"
-                }`}
+                className={`flex items-center gap-3 p-3 rounded cursor-pointer ${selectedUserId === u._id ? "bg-primary/10" : "hover:bg-secondary/50"
+                  }`}
               >
                 <Avatar>
                   <AvatarFallback>{u.name.charAt(0)}</AvatarFallback>
@@ -137,7 +136,7 @@ const TimeLogs = () => {
         <div className="flex-1 flex flex-col overflow-hidden">
 
           {/* Header */}
-          <div className="flex justify-between items-center p-4 bg-card rounded border mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center p-4 bg-card rounded border mb-4 gap-2">
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={() => setCurrentDate(subDays(currentDate, 1))}>
                 <ChevronLeft size={18} />
@@ -218,11 +217,10 @@ const TimeLogs = () => {
                       {timelineData.map(item => (
                         <div
                           key={item.id}
-                          className={`absolute top-4 h-12 rounded-sm group cursor-pointer ${
-                            item.idle
+                          className={`absolute top-4 h-12 rounded-sm group cursor-pointer ${item.idle
                               ? "bg-red-500/80 hover:bg-red-400"
                               : "bg-green-500/80 hover:bg-green-400"
-                          }`}
+                            }`}
                           style={{
                             left: item.left,
                             width: item.width

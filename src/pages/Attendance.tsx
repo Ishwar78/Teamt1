@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, subWeeks, addWeeks, subMonths, addMonths, subDays, addDays as addDay, eachDayOfInterval } from "date-fns";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, subWeeks, addWeeks, subMonths, addMonths, subDays, addDays as addDay, eachDayOfInterval, startOfDay, endOfDay } from "date-fns";
 
 type ViewMode = "day" | "week" | "month" | "dateRange";
 
@@ -70,7 +70,8 @@ const Attendance = () => {
 
     switch (viewMode) {
       case "day":
-        start = end = currentDate;
+        start = startOfDay(currentDate);
+        end = endOfDay(currentDate);
         display = format(currentDate, "dd MMM yyyy");
         break;
       case "week":
@@ -120,8 +121,8 @@ const Attendance = () => {
         finishTime: record.finishTime ? format(new Date(record.finishTime), "hh:mm a") : "-",
         timeline: record.timeline?.map((t: any) => ({
           ...t,
-          start: format(new Date(t.start), "hh:mm a"),
-          end: format(new Date(t.end), "hh:mm a"),
+          start: format(new Date(t.start), "HH:mm"),
+          end: format(new Date(t.end), "HH:mm"),
         })) || []
       }));
 
@@ -223,15 +224,15 @@ const Attendance = () => {
       <PageGuard permission="view_attendance">
         <div className="space-y-6">
           {/* Header with Navigation */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" onClick={handlePrev}>
                   <ChevronLeft size={18} />
                 </Button>
-                <div className="flex items-center gap-2 min-w-[160px] justify-center">
-                  <Calendar className="text-primary" size={20} />
-                  <h2 className="text-lg font-semibold">{displayRange}</h2>
+                <div className="flex items-center gap-2 min-w-[140px] justify-center">
+                  <Calendar className="text-primary hidden sm:block" size={20} />
+                  <h2 className="text-base sm:text-lg font-semibold whitespace-nowrap">{displayRange}</h2>
                 </div>
                 <Button variant="ghost" size="icon" onClick={handleNext}>
                   <ChevronRight size={18} />
@@ -240,9 +241,9 @@ const Attendance = () => {
 
               {/* Employee Selector (Admin Only) */}
               {isAdmin && teamMembers.length > 0 && (
-                <div className="flex items-center gap-2 ml-4 border-l pl-6 border-border">
+                <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-2 sm:border-l sm:pl-4 border-border">
                   <Select value={selectedUser} onValueChange={setSelectedUser}>
-                    <SelectTrigger className="w-56 bg-card border-border">
+                    <SelectTrigger className="w-full sm:w-56 bg-card border-border">
                       <Users size={14} className="mr-2 text-muted-foreground" />
                       <SelectValue placeholder="All Employees" />
                     </SelectTrigger>
@@ -260,14 +261,14 @@ const Attendance = () => {
             </div>
 
             {/* View Mode Tabs */}
-            <div className="flex gap-2">
+            <div className="flex overflow-x-auto w-full md:w-auto gap-2 pb-2 md:pb-0 scrollbar-hide">
               {(["day", "week", "month", "dateRange"] as ViewMode[]).map((mode) => (
                 <Button
                   key={mode}
                   variant={viewMode === mode ? "default" : "outline"}
                   size="sm"
                   onClick={() => setViewMode(mode)}
-                  className="capitalize"
+                  className="capitalize whitespace-nowrap"
                 >
                   {mode === "dateRange" ? "Date Range" : mode}
                 </Button>
@@ -279,44 +280,44 @@ const Attendance = () => {
           {viewMode === 'day' && attendanceData.length > 0 ? (
             <div className="space-y-6">
               {/* Day Stats Cards */}
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-primary/5 border-primary/20">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Start Time</p>
-                    <p className="text-2xl font-bold text-primary">{attendanceData[0]?.inTime || '-'}</p>
+                    <p className="text-sm text-foreground mb-1">Start Time</p>
+                    <p className="text-2xl font-bold text-primary">{attendanceData[0]?.inTime && attendanceData[0].inTime !== '-' ? attendanceData[0].inTime : '-'}</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-blue-500/5 border-blue-500/20">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Work Duration</p>
-                    <p className="text-2xl font-bold text-blue-500">{attendanceData[0]?.workHours}</p>
+                    <p className="text-sm text-foreground mb-1">Work Duration</p>
+                    <p className="text-2xl font-bold text-blue-500">{attendanceData[0]?.workHours || "00:00:00"}</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-yellow-500/5 border-yellow-500/20">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Offline Duration</p>
-                    <p className="text-2xl font-bold text-yellow-500">{attendanceData[0]?.idleHours}</p>
+                    <p className="text-sm text-foreground mb-1">Offline Duration</p>
+                    <p className="text-2xl font-bold text-yellow-500">{attendanceData[0]?.idleHours || "00:00:00"}</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-green-500/5 border-green-500/20">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Total Duration</p>
+                    <p className="text-sm text-foreground mb-1">Total Duration</p>
                     {/* Calculate total duration roughly */}
-                    <p className="text-2xl font-bold text-green-500">{stats.timeSpent}</p>
+                    <p className="text-2xl font-bold text-green-500">{stats.timeSpent || "00:00:00"}</p>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Detailed Timeline Table */}
-              <Card>
-                <CardContent className="p-0">
-                  <Table>
+              <Card className="overflow-hidden border-border bg-card">
+                <CardContent className="p-0 overflow-x-auto">
+                  <Table className="min-w-[600px]">
                     <TableHeader>
-                      <TableRow className="bg-primary/70 hover:bg-primary/80">
-                        <TableHead className="text-white font-semibold w-1/4">Start</TableHead>
-                        <TableHead className="text-white font-semibold w-1/4">End</TableHead>
-                        <TableHead className="text-white font-semibold w-1/4">Type</TableHead>
-                        <TableHead className="text-white font-semibold w-1/4">Duration</TableHead>
+                      <TableRow className="bg-primary hover:bg-primary/90">
+                        <TableHead className="text-white font-semibold">Start</TableHead>
+                        <TableHead className="text-white font-semibold">End</TableHead>
+                        <TableHead className="text-white font-semibold">Type</TableHead>
+                        <TableHead className="text-white font-semibold">Duration</TableHead>
                         <TableHead className="text-white font-semibold">Reason</TableHead>
                         <TableHead className="text-white font-semibold">Status</TableHead>
                       </TableRow>
@@ -324,14 +325,14 @@ const Attendance = () => {
                     <TableBody>
                       {attendanceData[0]?.timeline?.map((segment, idx) => (
                         <TableRow key={idx} className="hover:bg-muted/50 border-b border-border/50">
-                          <TableCell className="text-muted-foreground">{segment.start}</TableCell>
-                          <TableCell className="text-muted-foreground">{segment.end}</TableCell>
-                          <TableCell className={segment.type === 'Work' ? "text-blue-500" : "text-yellow-500"}>
+                          <TableCell className="text-foreground font-medium">{segment.start}</TableCell>
+                          <TableCell className="text-foreground font-medium">{segment.end}</TableCell>
+                          <TableCell className={segment.type === 'Work' ? "text-foreground font-medium" : "text-yellow-500 font-medium"}>
                             {segment.type}
                           </TableCell>
-                          <TableCell>{segment.duration}</TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
+                          <TableCell className="font-mono text-sm">{segment.duration}</TableCell>
+                          <TableCell className="text-muted-foreground"></TableCell>
+                          <TableCell className="text-muted-foreground"></TableCell>
                         </TableRow>
                       )) || (
                           <TableRow>
@@ -349,12 +350,12 @@ const Attendance = () => {
             // Standard View for Week/Month
             <>
               {/* Summary Stats */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
                   <CardContent className="p-6">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-2">Time Spent</p>
-                      <p className="text-3xl font-bold text-blue-500">{stats.timeSpent}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-blue-500">{stats.timeSpent}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -362,7 +363,7 @@ const Attendance = () => {
                   <CardContent className="p-6">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-2">Total Working Time</p>
-                      <p className="text-3xl font-bold text-green-500">{stats.workingTime}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-green-500">{stats.workingTime}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -370,7 +371,7 @@ const Attendance = () => {
                   <CardContent className="p-6">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-2">Idle Time</p>
-                      <p className="text-3xl font-bold text-yellow-500">{stats.idleTime}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-yellow-500">{stats.idleTime}</p>
                     </div>
                   </CardContent>
                 </Card>

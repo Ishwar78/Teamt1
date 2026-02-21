@@ -44,30 +44,71 @@ const schema = z.object({
 
 router.post('/', validate(schema), async (req, res) => {
 
-  const docs = req.body.logs.map((log: any) => ({
-    user_id: req.auth!.user_id,
-    company_id: req.auth!.company_id,
-    session_id: new Types.ObjectId(req.body.session_id),
+  let totalDur = 0;
+  let activeDur = 0;
+  let idleDur = 0;
+  let totalScore = 0;
 
-    timestamp: new Date(log.timestamp),
-    interval_start: new Date(log.interval_start),
-    interval_end: new Date(log.interval_end),
+  const docs = req.body.logs.map((log: any) => {
+    const start = new Date(log.interval_start).getTime();
+    const end = new Date(log.interval_end).getTime();
+    const durSecs = Math.max(0, Math.floor((end - start) / 1000));
 
-    keyboard_events: log.keyboard_events || 0,
-    mouse_events: log.mouse_events || 0,
-    mouse_distance: log.mouse_distance || 0,
-    activity_score: log.activity_score,
-    idle: log.idle || false,
+    totalDur += durSecs;
+    if (log.idle) idleDur += durSecs;
+    else activeDur += durSecs;
 
-    active_window: {
-      title: log.active_window.title,
-      app_name: log.active_window.app_name,
-      url: log.active_window.url || "",
-      category: log.active_window.category || "Other"
-    }
-  }));
+    totalScore += (log.activity_score || 0) * durSecs;
+
+    return {
+      user_id: req.auth!.user_id,
+      company_id: req.auth!.company_id,
+      session_id: new Types.ObjectId(req.body.session_id),
+
+      timestamp: new Date(log.timestamp),
+      interval_start: new Date(log.interval_start),
+      interval_end: new Date(log.interval_end),
+
+      keyboard_events: log.keyboard_events || 0,
+      mouse_events: log.mouse_events || 0,
+      mouse_distance: log.mouse_distance || 0,
+      activity_score: log.activity_score,
+      idle: log.idle || false,
+
+      active_window: {
+        title: log.active_window.title,
+        app_name: log.active_window.app_name,
+        url: log.active_window.url || "",
+        category: log.active_window.category || "Other"
+      }
+    };
+  });
 
   await ActivityLog.insertMany(docs);
+
+  // Update session summary
+  if (totalDur > 0 && req.body.session_id) {
+    const session = await import('../models/Session').then(m => m.Session).catch(() => null);
+    if (session) {
+      // Calculate new moving average for activity_score
+      const sessDoc = await session.findById(req.body.session_id);
+      if (sessDoc) {
+        const oldTotal = sessDoc.summary?.total_duration || 0;
+        const oldScore = sessDoc.summary?.activity_score || 0;
+        const newTotal = oldTotal + totalDur;
+        const newAvg = newTotal > 0 ? ((oldScore * oldTotal) + totalScore) / newTotal : 0;
+
+        await session.findByIdAndUpdate(req.body.session_id, {
+          $inc: {
+            "summary.total_duration": totalDur,
+            "summary.active_duration": activeDur,
+            "summary.idle_duration": idleDur
+          },
+          $set: { "summary.activity_score": newAvg }
+        });
+      }
+    }
+  }
 
   res.json({ success: true });
 });

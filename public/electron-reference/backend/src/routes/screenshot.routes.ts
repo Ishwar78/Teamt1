@@ -65,6 +65,15 @@ router.post(
         blurred: false,
       });
 
+      if (req.body.session_id) {
+        const session = await import('../models/Session').then(m => m.Session).catch(() => null);
+        if (session) {
+          await session.findByIdAndUpdate(req.body.session_id, {
+            $inc: { "summary.screenshots_count": 1 }
+          });
+        }
+      }
+
       res.status(201).json({
         success: true,
         id: screenshot._id,

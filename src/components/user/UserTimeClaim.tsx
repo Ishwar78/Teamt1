@@ -161,7 +161,7 @@ const UserTimeClaim = () => {
                     ) : (
                         <div className="space-y-3">
                             {claims.map(claim => (
-                                <div key={claim._id} className="flex items-center justify-between p-4 rounded-lg bg-secondary/10 border border-border">
+                                <div key={claim._id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-secondary/10 border border-border gap-4">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
                                             <span className="font-semibold text-foreground">{claim.date}</span>

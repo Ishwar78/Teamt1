@@ -39,14 +39,14 @@ const Reports = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         // Fetch Summary
-        const summaryRes = await axios.get('http://localhost:5000/api/reports/summary', { headers });
+        const summaryRes = await axios.get(`http://localhost:5000/api/reports/summary?period=${period}`, { headers });
         if (summaryRes.data.success) {
           setTotals(summaryRes.data.totals);
           setWeeklyData(summaryRes.data.weekly);
         }
 
         // Fetch User Stats
-        const usersRes = await axios.get('http://localhost:5000/api/reports/users', { headers });
+        const usersRes = await axios.get(`http://localhost:5000/api/reports/users?period=${period}`, { headers });
         if (usersRes.data.success) {
           setUserSummaries(usersRes.data.users);
           setUsersList(["All Users", ...usersRes.data.users.map((u: any) => u.name)]);
@@ -61,7 +61,7 @@ const Reports = () => {
     };
 
     fetchData();
-  }, [token]);
+  }, [token, period]);
 
   const handleExport = (type: "pdf" | "csv") => {
     toast({ title: `${type.toUpperCase()} export started`, description: "Your report will download shortly." });

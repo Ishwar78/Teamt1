@@ -68,7 +68,7 @@ const TeamManagement = () => {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Users className="text-primary" size={28} />
@@ -78,7 +78,7 @@ const TeamManagement = () => {
               Manage your team and their permissions
             </p>
           </div>
-          <Button onClick={() => setAddDialog(true)} className="gap-2">
+          <Button onClick={() => setAddDialog(true)} className="gap-2 w-full sm:w-auto">
             <Plus size={16} />
             Add Team Member
           </Button>
@@ -122,12 +122,12 @@ const TeamManagement = () => {
         </div>
 
         {/* Team Table */}
-        <Card>
+        <Card className="overflow-hidden border-border bg-card">
           <CardHeader>
             <CardTitle className="text-lg">Team Directory</CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            <Table>
+          <CardContent className="p-0 overflow-x-auto">
+            <Table className="min-w-[600px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
@@ -140,25 +140,27 @@ const TeamManagement = () => {
               <TableBody>
                 {members.map((member) => (
                   <TableRow key={member._id}>
-                    <TableCell className="font-medium">{member.name}</TableCell>
-                    <TableCell className="text-muted-foreground flex items-center gap-2">
-                      <Mail size={14} />
-                      {member.email}
+                    <TableCell className="font-medium whitespace-nowrap">{member.name}</TableCell>
+                    <TableCell>
+                      <span className="text-muted-foreground flex items-center gap-2 whitespace-nowrap">
+                        <Mail size={14} />
+                        {member.email}
+                      </span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="outline" className="capitalize whitespace-nowrap">
                         {member.role?.replace('_', ' ')}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant={member.status === 'active' ? 'default' : 'secondary'}
-                        className="capitalize"
+                        className="capitalize whitespace-nowrap"
                       >
                         {member.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right whitespace-nowrap">
                       <Button variant="ghost" size="sm">View</Button>
                     </TableCell>
                   </TableRow>

@@ -12,10 +12,25 @@ const router = Router();
 router.get('/summary', authenticate, requireRole('company_admin', 'sub_admin'), async (req: any, res, next) => {
     try {
         const companyId = new Types.ObjectId(req.auth.company_id as string);
+        const { period } = req.query;
+
+        const matchQuery: any = { company_id: companyId };
+
+        if (period === 'daily') {
+            matchQuery.start_time = { $gte: new Date(new Date().setHours(0, 0, 0, 0)) };
+        } else if (period === 'weekly') {
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            matchQuery.start_time = { $gte: lastWeek };
+        } else if (period === 'monthly') {
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            matchQuery.start_time = { $gte: lastMonth };
+        }
 
         // Aggregation for totals
         const totalStats = await Session.aggregate([
-            { $match: { company_id: companyId } },
+            { $match: matchQuery },
             {
                 $group: {
                     _id: null,
@@ -81,9 +96,24 @@ router.get('/summary', authenticate, requireRole('company_admin', 'sub_admin'), 
 router.get('/users', authenticate, requireRole('company_admin', 'sub_admin'), async (req: any, res, next) => {
     try {
         const companyId = new Types.ObjectId(req.auth.company_id as string);
+        const { period } = req.query;
+
+        const matchQuery: any = { company_id: companyId };
+
+        if (period === 'daily') {
+            matchQuery.start_time = { $gte: new Date(new Date().setHours(0, 0, 0, 0)) };
+        } else if (period === 'weekly') {
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            matchQuery.start_time = { $gte: lastWeek };
+        } else if (period === 'monthly') {
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            matchQuery.start_time = { $gte: lastMonth };
+        }
 
         const userStats = await Session.aggregate([
-            { $match: { company_id: companyId } },
+            { $match: matchQuery },
             {
                 $group: {
                     _id: "$user_id",

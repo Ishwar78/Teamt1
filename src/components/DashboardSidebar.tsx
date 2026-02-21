@@ -23,7 +23,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", permission: "view_dashboard" },
   { icon: Users, label: "Team", path: "/dashboard/team", permission: "view_team" },
-   { icon: Clock, label: "Time Logs", path: "/dashboard/time", permission: "view_time_logs" },
+  { icon: Clock, label: "Time Logs", path: "/dashboard/time", permission: "view_time_logs" },
   { icon: Camera, label: "Screenshots", path: "/dashboard/screenshots", permission: "view_screenshots" },
   { icon: Globe, label: "App & URL Usage", path: "/dashboard/usage", permission: "view_app_usage" },
   // { icon: Activity, label: "Activity Feed", path: "/dashboard/activity", permission: "view_activity" },
@@ -40,7 +40,11 @@ const menuItems: MenuItem[] = [
   { icon: Settings, label: "Settings", path: "/dashboard/settings", permission: "manage_settings" },
 ];
 
-const DashboardSidebar = () => {
+interface DashboardSidebarProps {
+  onCloseMobile?: () => void;
+}
+
+const DashboardSidebar = ({ onCloseMobile }: DashboardSidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { can } = usePermissions();
@@ -83,6 +87,11 @@ const DashboardSidebar = () => {
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => {
+                if (window.innerWidth < 768 && onCloseMobile) {
+                  onCloseMobile();
+                }
+              }}
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm transition-colors",
                 isActive
@@ -101,7 +110,10 @@ const DashboardSidebar = () => {
       {/* {!collapsed && <RoleSwitcher />} */}
 
       <div className="p-2 border-t border-border">
-        <Link to="/admin/login" onClick={logout} className="flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
+        <Link to="/admin/login" onClick={() => {
+          logout();
+          if (window.innerWidth < 768 && onCloseMobile) onCloseMobile();
+        }} className="flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary">
           <LogOut size={18} />
           {!collapsed && "Logout"}
         </Link>

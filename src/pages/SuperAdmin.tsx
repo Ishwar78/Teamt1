@@ -6,7 +6,7 @@ import {
   LogOut, ChevronLeft, ShieldCheck, TrendingUp, TrendingDown, DollarSign,
   Activity, Ban, CheckCircle2, AlertTriangle, Plus, Search, MoreHorizontal,
   Eye, UserX, UserCheck, ArrowUpDown, Edit2, Trash2, Mail, Globe, Clock,
-  MoreVertical,FileText
+  MoreVertical, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,7 +57,7 @@ const SuperAdminSidebar = () => {
             </div>
           </div>
         )}
-        <button onClick={() => setCollapsed(!collapsed)} className="text-muted-foreground hover:text-foreground">
+        <button onClick={() => setCollapsed(!collapsed)} className="text-muted-foreground hover:text-foreground hidden md:block">
           <ChevronLeft size={18} className={cn("transition-transform", collapsed && "rotate-180")} />
         </button>
       </div>
@@ -93,6 +93,7 @@ const SuperAdminSidebar = () => {
 export default function SuperAdmin() {
   const { loading } = usePlatform();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getTabFromPath = () => {
     const path = location.pathname;
@@ -111,17 +112,43 @@ export default function SuperAdmin() {
   if (loading) return <div className="flex h-screen items-center justify-center bg-[#0B0E14] text-white">Loading...</div>;
 
   return (
-    <div className="flex h-screen bg-[#0B0E14] text-gray-100 overflow-hidden font-sans selection:bg-cyan-500/30">
-      <SuperAdminSidebar />
-      <main className="flex-1 overflow-y-auto bg-[#0B0E14] relative">
-        <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="flex h-screen bg-[#0B0E14] text-gray-100 overflow-hidden font-sans selection:bg-cyan-500/30 relative">
+      {/* Mobile Header with Hamburger (Visible only on small screens) */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-800 bg-[#13161C] absolute top-0 left-0 right-0 z-30">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center font-bold text-primary-foreground text-xs">W</div>
+          <span className="font-bold text-foreground text-sm">WEBMOK</span>
+        </div>
+        <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {mobileMenuOpen ? <Trash2 size={24} className="hidden" /> : <MoreHorizontal size={24} />}
+        </Button>
+      </div>
+
+      {/* Sidebar Mobile Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Container */}
+      <div className={cn(
+        "fixed md:relative inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:transform-none bg-[#0B0E14]",
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      )}>
+        <SuperAdminSidebar />
+      </div>
+
+      <main className="flex-1 w-full md:w-auto h-screen overflow-y-auto overflow-x-hidden pt-16 md:pt-0 bg-[#0B0E14] relative">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
           {activeTab === "overview" && <OverviewTab />}
           {activeTab === "companies" && <CompaniesTab />}
           {activeTab === "users" && <UsersTab />}
           {activeTab === "plans" && <PlansTab />}
           {activeTab === "analytics" && <AnalyticsTab />}
           {activeTab === "settings" && <SettingsTab />}
-{activeTab === "demo" && <DemoInquiriesTab />}
+          {activeTab === "demo" && <DemoInquiriesTab />}
           {activeTab === "subscriptions" && (
             <div className="flex items-center justify-center h-96 text-gray-500">
               <div className="text-center">
@@ -279,8 +306,8 @@ function CompaniesTab() {
         <Button size="sm" className="gap-1 bg-cyan-600 hover:bg-cyan-500" onClick={() => setAddDialog(true)}><Plus size={14} /> Add Company</Button>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+        <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-sm">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search..." className="pl-9 bg-gray-900 border-gray-800" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
@@ -295,8 +322,8 @@ function CompaniesTab() {
         </Select>
       </div>
 
-      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden">
-        <table className="w-full text-sm text-left">
+      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[800px] text-sm text-left">
           <thead className="bg-gray-900/50 text-gray-400">
             <tr>
               <th className="p-4">Company</th>
@@ -523,8 +550,8 @@ function UsersTab() {
         <Input placeholder="Search users..." className="pl-9 bg-gray-900 border-gray-800" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden">
-        <table className="w-full text-sm text-left">
+      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[600px] text-sm text-left">
           <thead className="bg-gray-900/50 text-gray-400">
             <tr>
               <th className="p-4">User</th>
@@ -725,7 +752,7 @@ function SettingsTab() {
 
 
 
-      
+
     </div>
 
 
@@ -776,8 +803,8 @@ function DemoInquiriesTab() {
         </p>
       </div>
 
-      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden">
-        <table className="w-full text-sm text-left">
+      <div className="rounded-xl bg-[#13161C] border border-gray-800 overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[800px] text-sm text-left">
           <thead className="bg-gray-900/50 text-gray-400">
             <tr>
               <th className="p-4">Name</th>
