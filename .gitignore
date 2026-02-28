@@ -31,9 +31,9 @@ agent/dist/
 # =========================
 # Electron Build Files
 # =========================
-*.exe
-*.deb
-*.dmg
+# *.exe
+# *.deb
+# *.dmg
 *.AppImage
 *.blockmap
 *.zip
