@@ -9,7 +9,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Client from "./client";
-import FAQ from "./faq";
+// import FAQ from "./faq";
 
 import timeImg from "@/images/time.png";
 import screenshotImg from "@/images/screenshot.png";
@@ -235,7 +235,7 @@ const FeatureTabs = () => {
 <Client/>
 
 {/* FAQ Section */}
-<FAQ />
+{/* <FAQ /> */}
 {/* Why Teams Love Section */}
 
 <section className="py-24 bg-black text-white">
