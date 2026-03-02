@@ -55,7 +55,7 @@
           ]
         }
       ],
-      "artifactName": "WorkWiseAgent-${version}.dmg",
+      "artifactName": "WorkWiseAgent-${version}-mac.${ext}",
       "category": "public.app-category.productivity",
       "hardenedRuntime": false,
       "gatekeeperAssess": false

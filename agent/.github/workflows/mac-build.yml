@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13   # Intel runner (important for universal)
 
     steps:
       - name: Checkout Code
@@ -22,8 +22,8 @@ jobs:
         run: npm install
         working-directory: agent
 
-      - name: Build Mac DMG (Universal)
-        run: npx electron-builder --mac --universal --publish never
+      - name: Build Universal Mac DMG
+        run: npm run build:mac:universal
         working-directory: agent
 
       - name: Upload Artifact
