@@ -33,10 +33,8 @@ const UserTimeClaim = () => {
 
     const fetchClaims = async () => {
         try {
-            const res = await axios.get("http://127.0.0.1:5000/api/claims/my", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.data.claims) setClaims(res.data.claims);
+            const data = await apiFetch("/api/claims/my", token);
+            if (data.claims) setClaims(data.claims);
         } catch (error) {
             console.error(error);
         } finally {
@@ -49,11 +47,9 @@ const UserTimeClaim = () => {
         setTimelineLoading(true);
         try {
             // Get detailed attendance for the selected date
-            const res = await axios.get(`http://127.0.0.1:5000/api/reports/attendance?startDate=${formData.date}&endDate=${formData.date}&detailed=true`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.data.success && res.data.data.length > 0) {
-                setTimeline(res.data.data[0].timeline || []);
+            const data = await apiFetch(`/api/reports/attendance?startDate=${formData.date}&endDate=${formData.date}&detailed=true`, token);
+            if (data.success && data.data.length > 0) {
+                setTimeline(data.data[0].timeline || []);
             } else {
                 setTimeline([]);
             }
@@ -76,14 +72,15 @@ const UserTimeClaim = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const res = await axios.post("http://127.0.0.1:5000/api/claims", formData, {
-                headers: { Authorization: `Bearer ${token}` }
+            await apiFetch("/api/claims", token, {
+                method: "POST",
+                body: JSON.stringify(formData)
             });
             toast({ title: "Claim Submitted", description: "Your time claim has been sent for approval." });
             setFormData({ ...formData, startTime: "", endTime: "", reason: "" });
             fetchClaims();
         } catch (error: any) {
-            const errorMsg = error.response?.data?.message || "Could not submit claim";
+            const errorMsg = error.message || "Could not submit claim";
             toast({
                 title: "Submission Failed",
                 description: errorMsg,

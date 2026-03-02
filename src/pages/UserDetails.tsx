@@ -47,11 +47,11 @@ const UserDetails = () => {
         {screenshots.map((s) => (
           <img
             key={s._id}
-            src={`http://127.0.0.1:5000/api/agent/screenshots/view/${s._id}`}
+            src={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/agent/screenshots/view/${s._id}`}
             width={300}
             crossOrigin="anonymous"
             className="cursor-pointer rounded-lg"
-            onClick={() => window.open(`http://127.0.0.1:5000/api/agent/screenshots/view/${s._id}`, "_blank")}
+            onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/agent/screenshots/view/${s._id}`, "_blank")}
           />
 
         ))}

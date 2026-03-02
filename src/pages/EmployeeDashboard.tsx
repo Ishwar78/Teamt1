@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Calendar, CheckCircle, AlertCircle, Timer, Globe, FileText, LayoutDashboard } from "lucide-react";
 import { format } from "date-fns";
+import { apiFetch } from "@/lib/api";
 import UserAttendance from "@/components/user/UserAttendance";
 import UserUrls from "@/components/user/UserUrls";
 import UserTimeClaim from "@/components/user/UserTimeClaim";
@@ -25,12 +26,7 @@ const EmployeeDashboard = () => {
 
     const fetchMyStats = async () => {
         try {
-            const res = await fetch("http://127.0.0.1:5000/api/reports/my-summary", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const data = await res.json();
+            const data = await apiFetch("/api/reports/my-summary", token);
             if (data.success) {
                 const formatTime = (secs: number) => {
                     const h = Math.floor(secs / 3600);

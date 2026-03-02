@@ -3,6 +3,7 @@ import { authenticate } from '../middleware/auth';
 import { requireRole } from '../middleware/roleGuard';
 import { Session } from '../models/Session';
 import { Screenshot } from '../models/Screenshot';
+import { ActivityLog } from '../models/ActivityLog';
 
 export const dashboardRoutes = Router();
 
@@ -25,18 +26,24 @@ dashboardRoutes.get(
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
 
-      const hours = await Session.aggregate([
+      const hours = await ActivityLog.aggregate([
         {
           $match: {
             company_id: companyId,
-            start_time: { $gte: today }
+            interval_start: { $gte: today, $lte: endOfDay }
           }
         },
         {
           $group: {
             _id: null,
-            total: { $sum: "$summary.total_duration" }
+            total: {
+              $sum: {
+                $divide: [{ $subtract: ["$interval_end", "$interval_start"] }, 1000]
+              }
+            }
           }
         }
       ]);
@@ -44,7 +51,7 @@ dashboardRoutes.get(
       res.json({
         activeNow,
         screenshots,
-        hoursToday: hours[0]?.total || 0
+        hoursToday: Math.round(hours[0]?.total || 0)
       });
     } catch (err) {
       next(err);

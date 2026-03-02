@@ -15,7 +15,7 @@ import { Camera, Download, Users, Calendar } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { format } from "date-fns";
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const Screenshots = () => {
   const { token, user } = useAuth();

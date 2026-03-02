@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Globe, ExternalLink, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { apiFetch } from "@/lib/api";
 
 const UserUrls = () => {
     const { token, user } = useAuth();
@@ -12,12 +13,7 @@ const UserUrls = () => {
         const fetchUrls = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`http://127.0.0.1:5000/api/activity/usage?userId=${user?.id}&period=today`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const data = await res.json();
+                const data = await apiFetch(`/api/activity/usage?userId=${user?.id}&period=today`, token);
                 if (data.success) {
                     setUrls(data.urls || []);
                 }

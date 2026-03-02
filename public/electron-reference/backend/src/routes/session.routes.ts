@@ -27,17 +27,31 @@ router.post('/start', validate(startSchema), async (req, res) => {
   const company = await Company.findById(company_id);
   if (!company) throw new AppError('Company not found', 404);
 
-  const existing = await Session.findOne({
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Find any existing active/paused session
+  let existing = await Session.findOne({
     user_id,
     company_id,
     status: { $in: ['active', 'paused'] },
   });
 
   if (existing) {
-    return res.json({
-      session_id: existing._id,
-      message: 'Session already active'
-    });
+    if (existing.start_time < today) {
+      // Session is from a previous day. End it.
+      existing.status = 'ended';
+      existing.end_time = new Date();
+      existing.events.push({ type: 'end', timestamp: new Date() });
+      await existing.save();
+      existing = null; // Proceed to create a new session
+    } else {
+      // Session is from today
+      return res.json({
+        session_id: existing._id,
+        message: 'Session already active'
+      });
+    }
   }
 
   const session = await Session.create({

@@ -101,32 +101,43 @@ router.get('/my-summary', authenticate, async (req: any, res, next) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const stats = await Session.aggregate([
+        const endOfDay = new Date(today);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const stats = await ActivityLog.aggregate([
             {
                 $match: {
                     user_id: userId,
                     company_id: companyId,
-                    start_time: { $gte: today }
+                    interval_start: { $gte: today, $lte: endOfDay }
                 }
             },
             {
                 $group: {
                     _id: null,
-                    totalActive: { $sum: "$summary.active_duration" },
-                    totalIdle: { $sum: "$summary.idle_duration" },
-                    totalDuration: { $sum: "$summary.total_duration" }
+                    totalActive: {
+                        $sum: {
+                            $cond: [{ $eq: ["$idle", false] }, { $divide: [{ $subtract: ["$interval_end", "$interval_start"] }, 1000] }, 0]
+                        }
+                    },
+                    totalIdle: {
+                        $sum: {
+                            $cond: [{ $eq: ["$idle", true] }, { $divide: [{ $subtract: ["$interval_end", "$interval_start"] }, 1000] }, 0]
+                        }
+                    }
                 }
             }
         ]);
 
-        const result = stats[0] || { totalActive: 0, totalIdle: 0, totalDuration: 0 };
+        const result = stats[0] || { totalActive: 0, totalIdle: 0 };
+        const totalDuration = result.totalActive + result.totalIdle;
 
         res.json({
             success: true,
             stats: {
-                activeSec: result.totalActive,
-                idleSec: result.totalIdle,
-                totalSec: result.totalDuration
+                activeSec: Math.round(result.totalActive),
+                idleSec: Math.round(result.totalIdle),
+                totalSec: Math.round(totalDuration)
             }
         });
     } catch (err) {
@@ -214,7 +225,7 @@ router.get('/attendance', authenticate, async (req: any, res, next) => {
 
         const query: any = {
             company_id: companyId,
-            start_time: {
+            interval_start: {
                 $gte: start,
                 $lte: end
             }
@@ -227,20 +238,24 @@ router.get('/attendance', authenticate, async (req: any, res, next) => {
             query.user_id = new Types.ObjectId(req.auth.user_id as string);
         }
 
-        const sessions = await Session.aggregate([
+        const stats = await ActivityLog.aggregate([
             { $match: query },
-            { $sort: { start_time: 1 } },
+            { $sort: { interval_start: 1 } },
             {
                 $group: {
                     _id: {
-                        date: { $dateToString: { format: "%Y-%m-%d", date: "$start_time" } },
+                        date: { $dateToString: { format: "%Y-%m-%d", date: "$interval_start", timezone: "+05:30" } },
                         user: "$user_id"
                     },
-                    inTime: { $first: "$start_time" },
-                    finishTime: { $last: "$end_time" },
-                    activeDuration: { $sum: "$summary.active_duration" },
-                    idleDuration: { $sum: "$summary.idle_duration" },
-                    sessions: { $push: "$$ROOT" }
+                    inTime: { $first: "$interval_start" },
+                    finishTime: { $last: "$interval_end" },
+                    activeDuration: {
+                        $sum: { $cond: [{ $eq: ["$idle", false] }, { $divide: [{ $subtract: ["$interval_end", "$interval_start"] }, 1000] }, 0] }
+                    },
+                    idleDuration: {
+                        $sum: { $cond: [{ $eq: ["$idle", true] }, { $divide: [{ $subtract: ["$interval_end", "$interval_start"] }, 1000] }, 0] }
+                    },
+                    hoursActive: { $addToSet: { $hour: { date: "$interval_start", timezone: "+05:30" } } }
                 }
             },
             { $sort: { "_id.date": -1 } }
@@ -253,7 +268,7 @@ router.get('/attendance', authenticate, async (req: any, res, next) => {
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         };
 
-        const populated = await Promise.all(sessions.map(async (record) => {
+        const populated = await Promise.all(stats.map(async (record) => {
             let timeline: any[] = [];
             if (req.query.detailed === 'true') {
                 // Fetch granular activity logs for this user and day
@@ -322,11 +337,7 @@ router.get('/attendance', authenticate, async (req: any, res, next) => {
                 if (h.includes('PM') && hour !== 12) hour += 12;
                 if (h.includes('AM') && hour === 12) hour = 0;
 
-                const hasSession = record.sessions.some((s: any) => {
-                    const paramsStart = new Date(s.start_time);
-                    const paramsEnd = s.end_time ? new Date(s.end_time) : new Date();
-                    return paramsStart.getHours() <= hour && paramsEnd.getHours() >= hour;
-                });
+                const hasSession = record.hoursActive?.includes(hour);
 
                 if (hasSession) hourlyData[h] = "Active";
             });

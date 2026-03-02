@@ -74,12 +74,7 @@ const UserAttendance = () => {
                 const startStr = format(startDate, "yyyy-MM-dd");
                 const endStr = format(endDate, "yyyy-MM-dd");
 
-                const res = await fetch(`http://127.0.0.1:5000/api/reports/attendance?startDate=${startStr}&endDate=${endStr}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const result = await res.json();
+                const result = await apiFetch(`/api/reports/attendance?startDate=${startStr}&endDate=${endStr}`, token);
 
                 if (result.success) {
                     const formattedData = result.data.map((item: any) => ({

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Activity, Camera, Clock } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import EmployeeDashboard from "./EmployeeDashboard";
 
 const Dashboard = () => {
@@ -17,17 +18,7 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/dashboard/stats", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to load stats");
-      }
-
-      const data = await res.json();
+      const data = await apiFetch("/api/dashboard/stats", token);
       setStats(data);
     } catch (err: any) {
       console.error(err);
