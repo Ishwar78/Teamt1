@@ -9,14 +9,14 @@
   },
   "homepage": "https://workwise.app",
   "license": "ISC",
-  "scripts": {
-    "start": "electron .",
-    "dev": "electron .",
-    "build": "electron-builder",
-    "build:mac": "electron-builder --mac dmg --universal",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux"
-  },
+ "scripts": {
+  "start": "electron .",
+  "dev": "electron .",
+  "build": "electron-builder",
+  "build:mac": "electron-builder --mac dmg",
+  "build:win": "electron-builder --win",
+  "build:linux": "electron-builder --linux"
+},
   "dependencies": {
     "axios": "^1.13.5",
     "form-data": "^4.0.5",
@@ -51,14 +51,8 @@
     "asarUnpack": [
       "node_modules/active-win/**/*"
     ],
-
-    "mac": {
-  "target": [
-    {
-      "target": "dmg",
-      "arch": ["x64", "arm64"]
-    }
-  ],
+"mac": {
+  "target": "dmg",
   "artifactName": "WorkWiseAgent-${version}-${arch}-mac.${ext}",
   "category": "public.app-category.productivity",
   "minimumSystemVersion": "10.15",
