@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest   # 🔥 IMPORTANT CHANGE
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code
@@ -18,13 +18,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Clean Install
+        run: |
+          rm -rf node_modules
+          rm -rf package-lock.json
+          npm install
         working-directory: agent
 
       - name: Build Universal Mac DMG
-        run: npx electron-builder --mac dmg --universal
+        run: npx electron-builder --mac dmg --universal --publish=never
         working-directory: agent
 
       - name: Upload Artifact

@@ -13,7 +13,7 @@
     "start": "electron .",
     "dev": "electron .",
     "build": "electron-builder",
-    "build:mac": "electron-builder --mac --universal",
+    "build:mac": "electron-builder --mac dmg --universal",
     "build:win": "electron-builder --win",
     "build:linux": "electron-builder --linux"
   },
@@ -37,13 +37,20 @@
     "directories": {
       "output": "dist"
     },
+
     "files": [
       "main.js",
       "preload.js",
       "renderer/**/*",
-      "package.json"
+      "package.json",
+      "!node_modules/active-win/build-tmp-*"
     ],
+
     "asar": true,
+
+    "asarUnpack": [
+      "node_modules/active-win/**/*"
+    ],
 
     "mac": {
       "target": [
@@ -54,9 +61,7 @@
       ],
       "artifactName": "WorkWiseAgent-${version}-mac.${ext}",
       "category": "public.app-category.productivity",
-
       "minimumSystemVersion": "10.15",
-
       "hardenedRuntime": false,
       "gatekeeperAssess": false
     },
