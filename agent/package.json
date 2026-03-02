@@ -53,18 +53,18 @@
     ],
 
     "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["universal"]
-        }
-      ],
-      "artifactName": "WorkWiseAgent-${version}-mac.${ext}",
-      "category": "public.app-category.productivity",
-      "minimumSystemVersion": "10.15",
-      "hardenedRuntime": false,
-      "gatekeeperAssess": false
-    },
+  "target": [
+    {
+      "target": "dmg",
+      "arch": ["x64", "arm64"]
+    }
+  ],
+  "artifactName": "WorkWiseAgent-${version}-${arch}-mac.${ext}",
+  "category": "public.app-category.productivity",
+  "minimumSystemVersion": "10.15",
+  "hardenedRuntime": false,
+  "gatekeeperAssess": false
+},
 
     "win": {
       "target": "nsis",

@@ -27,6 +27,58 @@ const fadeUp = {
 // const DOWNLOAD_BASE = "https://releases.webmok.com/agent";
 const DOWNLOAD_BASE = "/downloads";
 
+// const platforms = [
+//   {
+//     name: "Windows",
+//     icon: Monitor,
+//     version: "v1.0.0",
+//     size: "76 MB",
+//     ext: ".exe",
+//     file: "WorkWiseAgent-Setup-1.0.0.exe",
+//     downloadUrl: `${DOWNLOAD_BASE}/WorkWiseAgent-Setup-1.0.0.exe`,
+//     minOs: "Windows 10 (64-bit) or later",
+//     steps: [
+//       "Download installer",
+//       "Run setup file",
+//       "Grant required permissions",
+//       "Agent auto-starts after install",
+//     ],
+//   },
+//   {
+//     name: "macOS",
+//     icon: Apple,
+//     version: "v1.0.0",
+//     size: "95 MB",
+//     ext: ".dmg",
+//     file: "WorkWiseAgent-1.0.0.dmg",
+//     downloadUrl: `${DOWNLOAD_BASE}/WorkWiseAgent-1.0.0.dmg`,
+//     minOs: "macOS 12 Monterey or later",
+//     steps: [
+//       "Open downloaded DMG",
+//       "Drag to Applications",
+//       "Grant Screen Recording & Accessibility permission",
+//       "Launch agent",
+//     ],
+//   },
+//   {
+//     name: "Linux",
+//     icon: Terminal,
+//     version: "v1.0.0",
+//     size: "72 MB",
+//     ext: ".deb",
+//     file: "WorkWiseAgent-1.0.0.deb",
+//     downloadUrl: `${DOWNLOAD_BASE}/WorkWiseAgent-1.0.0.deb`,
+//     minOs: "Ubuntu 20.04+ / Debian 11+",
+//     steps: [
+//       "Download .deb file",
+//       "Install using: sudo dpkg -i WorkWiseAgent-1.0.0.deb",
+//       "Launch agent",
+//     ],
+//   },
+// ];
+
+
+
 const platforms = [
   {
     name: "Windows",
@@ -44,15 +96,17 @@ const platforms = [
       "Agent auto-starts after install",
     ],
   },
+
+  // ✅ NEW MAC INTEL CARD
   {
-    name: "macOS",
+    name: "macOS (Intel)",
     icon: Apple,
     version: "v1.0.0",
     size: "95 MB",
     ext: ".dmg",
-    file: "WorkWiseAgent-1.0.0.dmg",
-    downloadUrl: `${DOWNLOAD_BASE}/WorkWiseAgent-1.0.0.dmg`,
-    minOs: "macOS 12 Monterey or later",
+    file: "WorkWiseAgent-1.0.0-x64-mac.dmg",
+    downloadUrl: `${DOWNLOAD_BASE}/WorkWiseAgent-1.0.0-x64-mac.dmg`,
+    minOs: "macOS 10.15+ (Intel)",
     steps: [
       "Open downloaded DMG",
       "Drag to Applications",
@@ -60,6 +114,25 @@ const platforms = [
       "Launch agent",
     ],
   },
+
+  // ✅ NEW MAC ARM CARD
+  {
+    name: "macOS (Apple Silicon)",
+    icon: Apple,
+    version: "v1.0.0",
+    size: "98 MB",
+    ext: ".dmg",
+    file: "WorkWiseAgent-1.0.0-arm64-mac.dmg",
+    downloadUrl: `${DOWNLOAD_BASE}/WorkWiseAgent-1.0.0-arm64-mac.dmg`,
+    minOs: "macOS 11+ (M1 / M2 / M3)",
+    steps: [
+      "Open downloaded DMG",
+      "Drag to Applications",
+      "Grant Screen Recording & Accessibility permission",
+      "Launch agent",
+    ],
+  },
+
   {
     name: "Linux",
     icon: Terminal,
@@ -76,6 +149,11 @@ const platforms = [
     ],
   },
 ];
+
+
+
+
+
 
 const systemRequirements = [
   { icon: Cpu, label: "Processor", value: "Dual-core 1.5 GHz or faster (x64 / ARM64)" },
@@ -109,7 +187,7 @@ const detectOS = (): string => {
   const ua = navigator.userAgent.toLowerCase();
 
   if (ua.includes("win")) return "Windows";
-  if (ua.includes("mac")) return "macOS";
+  if (ua.includes("mac")) return "macOS (Intel)";
   if (ua.includes("linux") && !ua.includes("android")) return "Linux";
 
   return "";

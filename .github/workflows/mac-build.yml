@@ -20,15 +20,12 @@ jobs:
           node-version: 18
           cache: npm
 
-      - name: Clean Install
-        run: |
-          rm -rf node_modules
-          rm -rf package-lock.json
-          npm install
+      - name: Install Dependencies
+        run: npm install
         working-directory: agent
 
-      - name: Build Universal Mac DMG
-        run: npx electron-builder --mac dmg --universal --publish=never
+      - name: Build Mac (x64 + arm64)
+        run: npx electron-builder --mac dmg --publish=never
         working-directory: agent
 
       - name: Upload Artifact
