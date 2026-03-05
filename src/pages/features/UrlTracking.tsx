@@ -7,6 +7,12 @@ import Footer from "@/components/Footer";
 import Client from "../client";
 import StartTracking from "../StartTracking";
 
+import urlLogsImg from "@/images/urltr.png";
+import domainCategoryImg from "@/images/domainbased.png";
+import exportReportsImg from "@/images/monthwise.png";
+
+
+
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
@@ -146,6 +152,149 @@ const UrlTracking = () => (
         </motion.div>
       ))}
     </motion.div>
+
+  </div>
+</section>
+
+
+{/* ================= Real-Time URL Logs ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        <h3 className="text-4xl font-bold text-white mb-6">
+          Real-Time URL Logs
+        </h3>
+
+        <p className="text-lg text-white/80 leading-relaxed">
+          View visited websites in real-time with timestamps and active
+          durations, directly linked to users’ tracked sessions.
+        </p>
+      </motion.div>
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={urlLogsImg}
+          alt="Real-Time URL Logs"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+
+{/* ================= Domain Categorization ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={domainCategoryImg}
+          alt="Domain Categorization"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+
+        <h3 className="text-4xl font-bold text-white mb-6">
+          Domain-Based Categorization
+        </h3>
+
+        <p className="text-lg text-white/80 leading-relaxed">
+          Use intelligent tagging to group URLs into categories like
+          Social Media, Research, Communication, or Entertainment.
+        </p>
+
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+
+{/* ================= Exportable Reports ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+
+        <h3 className="text-4xl font-bold text-white mb-6">
+          Exportable Reports
+        </h3>
+
+        <p className="text-lg text-white/80 leading-relaxed">
+          Generate CSV or PDF reports of URL activity per day, week, or month
+          for HR, compliance, or performance reviews.
+        </p>
+
+      </motion.div>
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={exportReportsImg}
+          alt="Export Reports"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+    </div>
 
   </div>
 </section>

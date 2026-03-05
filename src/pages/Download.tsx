@@ -189,21 +189,20 @@ const detectOS = (): string => {
   if (ua.includes("win")) return "Windows";
   if (ua.includes("mac")) return "macOS (Intel)";
   if (ua.includes("linux") && !ua.includes("android")) return "Linux";
-
+ 
   return "";
 };
 
 
 
-
+ 
 const DownloadPage = () => {
   const detectedOS = useMemo(() => detectOS(), []);
   // const handleDownload = (platformName: string, url: string) => {
   //   if (!detectedOS) {
   //     window.location.href = url;
   //     return;
-  //   }
-
+  //   }  
   //   if (platformName !== detectedOS) {
   //     alert(`You are using ${detectedOS}. Please download the correct installer.`);
   //     return;

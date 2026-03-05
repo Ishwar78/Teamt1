@@ -6,6 +6,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Client from "../client";
 import StartTracking from "../StartTracking";
+import teamDashboard from "@/images/dashboard.png";
+
+import activityOverview from "@/images/useractivity.png";
+import inviteMembers from "@/images/invite.png";
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -78,8 +83,179 @@ const TeamManagementFeature = () => (
         </motion.div> */}
       </div>
     </section>
+{/* ================= Essential Features Section ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    {/* Heading */}
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      className="text-center max-w-4xl mx-auto mb-20"
+    >
+      <motion.h2
+        variants={fadeUp}
+        custom={0}
+        className="text-4xl md:text-5xl font-bold text-foreground mb-6"
+      >
+        Essential Features for Team Success
+      </motion.h2>
+
+      <motion.p
+        variants={fadeUp}
+        custom={1}
+        className="text-lg text-muted-foreground"
+      >
+        TeamTreck gives you the tools to lead your team with clarity. From
+        real-time dashboards to workload reports and smart task assignment,
+        you'll have everything you need to manage people and performance with ease.
+      </motion.p>
+    </motion.div>
 
 
+    {/* Content */}
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Left Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={2}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+
+        <h3 className="text-4xl font-bold text-foreground mb-6">
+          Team Dashboard
+        </h3>
+
+        <p className="text-muted-foreground text-lg leading-relaxed">
+          A centralized hub to view and manage your entire team. Get a snapshot
+          of who's online, active, or assigned to key tasks and projects.
+        </p>
+
+      </motion.div>
+
+
+      {/* Right Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={3}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+
+        <img
+          src={teamDashboard}
+          alt="Team Dashboard"
+          className="w-full h-auto"
+        />
+
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+{/* ================= User Activity Overview ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={activityOverview}
+          alt="User Activity Overview"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+
+        <h3 className="text-4xl font-bold text-foreground mb-6">
+          User Activity Overview
+        </h3>
+
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          Instantly view recent activities, tasks completed, and time spent by
+          each team member to assess engagement and workload balance.
+        </p>
+
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+{/* ================= Invite Members Section ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+
+        <h3 className="text-4xl font-bold text-foreground mb-6">
+          Add / Invite Members with Ease
+        </h3>
+
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          Invite users via email or link, assign them to projects, and set roles
+          in just a few clicks. No complex onboarding or technical setup required.
+        </p>
+
+      </motion.div>
+
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={inviteMembers}
+          alt="Invite Members"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
 
 {/* Why Choose TeamTrack Section */}
 <section className="py-24">

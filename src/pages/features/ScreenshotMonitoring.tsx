@@ -7,6 +7,16 @@ import Footer from "@/components/Footer";
 import Client from "../client";
 import StartTracking from "../StartTracking";
 
+
+
+
+import autoCaptureImg from "@/images/automaticscreenshot.png";
+import timelineViewImg from "@/images/screentimeline.png";
+import activityIndicatorsImg from "@/images/Screenshot.png";
+
+
+
+
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
@@ -148,6 +158,148 @@ const ScreenshotMonitoring = () => (
 
   </div>
 </section>
+
+{/* ================= Automatic Screenshot Capture ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        <h3 className="text-4xl font-bold text-white mb-6">
+          Automatic Screenshot Capture
+        </h3>
+
+        <p className="text-lg text-white/80 leading-relaxed">
+          TeamTrack captures screenshots every 5, 10, or custom-set intervals
+          during active sessions—fully automated and non-intrusive.
+        </p>
+      </motion.div>
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={autoCaptureImg}
+          alt="Automatic Screenshot Capture"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+
+{/* ================= Screenshot Timeline View ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={timelineViewImg}
+          alt="Screenshot Timeline"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        <h3 className="text-4xl font-bold text-white mb-6">
+          Screenshot Timeline View
+        </h3>
+
+        <p className="text-lg text-white/80 leading-relaxed">
+          View screenshots in chronological order alongside time logs.
+          Perfect for visualizing an entire day’s activity at a glance.
+        </p>
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+
+{/* ================= Activity Indicators ================= */}
+
+<section className="py-24">
+  <div className="container mx-auto px-4">
+
+    <div className="grid md:grid-cols-2 gap-16 items-center">
+
+      {/* Text */}
+      <motion.div
+        variants={fadeUp}
+        custom={0}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        <h3 className="text-4xl font-bold text-white mb-6">
+          Activity Indicators
+        </h3>
+
+        <p className="text-lg text-white/80 leading-relaxed">
+          Each screenshot includes a visual activity score based on
+          mouse and keyboard interaction, helping highlight focused
+          vs idle periods.
+        </p>
+      </motion.div>
+
+      {/* Image */}
+      <motion.div
+        variants={fadeUp}
+        custom={1}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="rounded-2xl overflow-hidden border border-border shadow-xl"
+      >
+        <img
+          src={activityIndicatorsImg}
+          alt="Activity Indicators"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+    </div>
+
+  </div>
+</section>
+
+
+
 <Client/>
   <StartTracking />
     <Footer />

@@ -53,6 +53,7 @@ import StartTracking from "./pages/StartTracking";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import HelpCenter from "./pages/HelpCenter";
 import ScrollToTop from "./components/ScrollToTop";
+import About from "./pages/About";
 
 
 const queryClient = new QueryClient();
@@ -94,6 +95,10 @@ const App = () => (
               <Route path="/privacypolicy" element={<PrivacyPolicy />} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/support" element={<ScrollToTop />} />
+              <Route path="/about" element={<About />}/>
+
+
+
               {/* Company Dashboard */}
               <Route path="/dashboard" element={<CompanyAdminAuthGuard><Dashboard /></CompanyAdminAuthGuard>} />
               <Route path="/dashboard/team" element={<CompanyAdminAuthGuard><TeamManagement /></CompanyAdminAuthGuard>} />
