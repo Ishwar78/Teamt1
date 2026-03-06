@@ -297,7 +297,7 @@ ipcMain.on('end-session', async () => {
     });
 
     sessionId = null;
-    token = null;
+    token = null; 
     isPaused = false;
     currentIdle = false;
     currentActivityScore = 100;
