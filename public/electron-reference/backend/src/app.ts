@@ -18,6 +18,7 @@ import { publicRoutes } from "./routes/public.routes";
 import { paymentRoutes } from "./routes/payment.routes";
 import { claimRoutes } from "./routes/claim.routes";
 import { reportRoutes } from "./routes/reports.routes";
+import { ticketRoutes } from "./routes/ticket.routes";
 
 const app = express();
 
@@ -90,6 +91,7 @@ app.use("/api/public", publicRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/tickets", ticketRoutes);
 
 /* ================= ERROR HANDLER ================= */
 app.use(errorHandler);

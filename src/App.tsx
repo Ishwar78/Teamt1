@@ -38,6 +38,7 @@ import NotFound from "./pages/NotFound";
 import TimeTracker from "./pages/features/TimeTracker";
 import TeamManagementFeature from "./pages/features/TeamManagementFeature";
 import ScreenshotMonitoring from "./pages/features/ScreenshotMonitoring";
+import SupportTickets from "./pages/SupportTickets";
 import UrlTracking from "./pages/features/UrlTracking";
 import WorkforceAnalytics from "./pages/solutions/WorkforceAnalytics";
 import ProductivityAnalytics from "./pages/solutions/ProductivityAnalytics";
@@ -66,7 +67,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-           <ScrollToTop />
+            <ScrollToTop />
             <Routes>
               {/* Public */}
               <Route path="/" element={<Index />} />
@@ -88,14 +89,14 @@ const App = () => (
               <Route path="/solutions/employee-monitoring" element={<EmployeeMonitoring />} />
               <Route path="/solutions/time-reporting" element={<TimeReporting />} />
               <Route path="/agent" element={<AgentPanel />} />
-              <Route path="/client" element={<Client />}/>
+              <Route path="/client" element={<Client />} />
               {/* <Route path="/faq" element={<FAQ/>} /> */}
               <Route path="/team/:id" element={<UserDetails />} />
               <Route path="/StartTracking" element={<StartTracking />} />
               <Route path="/privacypolicy" element={<PrivacyPolicy />} />
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/support" element={<ScrollToTop />} />
-              <Route path="/about" element={<About />}/>
+              <Route path="/about" element={<About />} />
 
 
 
@@ -118,6 +119,7 @@ const App = () => (
 
               <Route path="/dashboard/justifications" element={<CompanyAdminAuthGuard><IdleJustification /></CompanyAdminAuthGuard>} />
               <Route path="/dashboard/time-claim" element={<CompanyAdminAuthGuard><TimeClaim /></CompanyAdminAuthGuard>} />
+              <Route path="/dashboard/support" element={<CompanyAdminAuthGuard><SupportTickets /></CompanyAdminAuthGuard>} />
 
               {/* Super Admin */}
               <Route path="/super-admin" element={<SuperAdminAuthGuard><SuperAdmin /></SuperAdminAuthGuard>} />

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, Clock, Camera, Globe, BarChart3,
   Settings, CreditCard, LogOut, ChevronLeft, UserPlus, Building2,
-  Activity, FileText, Bell, ShieldBan, Timer, CalendarCheck, PlayCircle
+  Activity, FileText, Bell, ShieldBan, Timer, CalendarCheck, PlayCircle, LifeBuoy
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell, NotificationDropdown, useNotifications } from "@/components/NotificationCenter";
@@ -38,6 +38,7 @@ const menuItems: MenuItem[] = [
   // { icon: PlayCircle, label: "Sessions", path: "/dashboard/sessions", permission: "view_sessions" },
   { icon: CreditCard, label: "Billing", path: "/dashboard/billing", permission: "manage_billing" },
   { icon: Settings, label: "Settings", path: "/dashboard/settings", permission: "manage_settings" },
+  { icon: LifeBuoy, label: "Support Tickets", path: "/dashboard/support", permission: "manage_settings" },
 ];
 
 interface DashboardSidebarProps {

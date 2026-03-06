@@ -8,6 +8,7 @@ import { Plan } from '../models/Plan';
 import { AppError } from '../utils/errors';
 import { DemoInquiry } from "../models/DemoInquiry";
 import { sendCompanyCreatedEmail } from '../services/mail.service';
+import { SupportTicket } from '../models/SupportTicket';
 const router = Router();
 
 /* ================= PLANS ================= */
@@ -334,5 +335,68 @@ router.get(
     }
   }
 );
+
+/* =======================================================
+   SUPPORT TICKETS
+======================================================= */
+
+// GET all support tickets
+router.get("/tickets", authenticate, requireRole("super_admin"), async (req, res, next) => {
+  try {
+    const tickets = await SupportTicket.find()
+      .populate('companyId', 'name')
+      .populate('createdBy', 'name email role')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: tickets });
+  } catch (err) { next(err); }
+});
+
+// REPLY to a support ticket
+router.post("/tickets/:id/reply", authenticate, requireRole("super_admin"), async (req: any, res, next) => {
+  try {
+    const { message } = req.body;
+    if (!message) {
+      return res.status(400).json({ success: false, message: "Message is required" });
+    }
+
+    const ticket = await SupportTicket.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: "Ticket not found" });
+    }
+
+    ticket.replies.push({
+      senderModel: 'SuperAdmin',
+      senderId: req.auth.user_id,
+      message,
+      createdAt: new Date()
+    });
+
+    await ticket.save();
+    res.json({ success: true, data: ticket });
+  } catch (err) { next(err); }
+});
+
+// UPDATE ticket status
+router.put("/tickets/:id/status", authenticate, requireRole("super_admin"), async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    if (!['Open', 'In Progress', 'Resolved'].includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status" });
+    }
+
+    const ticket = await SupportTicket.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: "Ticket not found" });
+    }
+
+    res.json({ success: true, data: ticket });
+  } catch (err) { next(err); }
+});
 
 export const superAdminRoutes = router;

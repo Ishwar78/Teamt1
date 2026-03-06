@@ -6,7 +6,7 @@ import {
   LogOut, ChevronLeft, ShieldCheck, TrendingUp, TrendingDown, DollarSign,
   Activity, Ban, CheckCircle2, AlertTriangle, Plus, Search, MoreHorizontal,
   Eye, UserX, UserCheck, ArrowUpDown, Edit2, Trash2, Mail, Globe, Clock,
-  MoreVertical, FileText
+  MoreVertical, FileText, LifeBuoy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,7 @@ const superAdminMenu = [
   { icon: Activity, label: "Analytics", path: "/super-admin/analytics" },
   { icon: Settings, label: "Settings", path: "/super-admin/settings" },
   { icon: Mail, label: "Demo Inquiries", path: "/super-admin/demo-inquiries" },
+  { icon: LifeBuoy, label: "Support Tickets", path: "/super-admin/tickets" },
 ];
 
 const SuperAdminSidebar = () => {
@@ -104,6 +105,7 @@ export default function SuperAdmin() {
     if (path.includes("/analytics")) return "analytics";
     if (path.includes("/settings")) return "settings";
     if (path.includes("/demo-inquiries")) return "demo";
+    if (path.includes("/tickets")) return "tickets";
     return "overview";
   };
 
@@ -149,6 +151,7 @@ export default function SuperAdmin() {
           {activeTab === "analytics" && <AnalyticsTab />}
           {activeTab === "settings" && <SettingsTab />}
           {activeTab === "demo" && <DemoInquiriesTab />}
+          {activeTab === "tickets" && <TicketsTab />}
           {activeTab === "subscriptions" && (
             <div className="flex items-center justify-center h-96 text-gray-500">
               <div className="text-center">
@@ -872,6 +875,181 @@ function DemoInquiriesTab() {
             No demo inquiries yet.
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─── TICKETS TAB ───
+function TicketsTab() {
+  const { token } = useAuth();
+  const { toast } = useToast();
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
+  const [replyMsg, setReplyMsg] = useState("");
+
+  const fetchTickets = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/super-admin/tickets", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.success) setTickets(res.data.data);
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to fetch tickets", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) fetchTickets();
+  }, [token]);
+
+  const handleReply = async () => {
+    if (!replyMsg.trim() || !selectedTicket) return;
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/super-admin/tickets/${selectedTicket._id}/reply`,
+        { message: replyMsg },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success) {
+        setReplyMsg("");
+        setSelectedTicket(res.data.data);
+        fetchTickets();
+        toast({ title: "Success", description: "Reply sent" });
+      }
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to send reply", variant: "destructive" });
+    }
+  };
+
+  const updateStatus = async (status: string) => {
+    if (!selectedTicket) return;
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/super-admin/tickets/${selectedTicket._id}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success) {
+        setSelectedTicket(res.data.data);
+        fetchTickets();
+        toast({ title: "Success", description: "Status updated" });
+      }
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
+    }
+  };
+
+  if (loading) return <div className="text-gray-400">Loading tickets...</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold flex items-center gap-2"><LifeBuoy className="text-primary" /> Support Tickets</h2>
+        <div className="text-gray-400">{tickets.length} total tickets</div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Ticket List */}
+        <div className="lg:col-span-1 rounded-xl border border-border bg-[#13161C] flex flex-col h-[70vh]">
+          <div className="p-4 border-b border-gray-800 font-semibold text-white">All Tickets</div>
+          <div className="overflow-y-auto flex-1 p-2 space-y-2">
+            {tickets.length === 0 ? (
+              <div className="p-4 text-center text-gray-500 text-sm">No tickets found.</div>
+            ) : (
+              tickets.map((t) => (
+                <div
+                  key={t._id}
+                  onClick={() => setSelectedTicket(t)}
+                  className={`p-4 rounded-lg cursor-pointer transition-colors border ${selectedTicket?._id === t._id ? "bg-cyan-500/10 border-cyan-500/30" : "bg-[#1A1D24] hover:bg-gray-800 border-transparent"}`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-sm text-white truncate pr-2">{t.title}</h3>
+                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${t.status === 'Open' ? 'text-green-400 border-green-400/30' : t.status === 'In Progress' ? 'text-blue-400 border-blue-400/30' : 'text-gray-400 border-gray-400/30'}`}>
+                      {t.status}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-gray-400 flex justify-between">
+                    <span>{t.companyId?.name || "Unknown"}</span>
+                    <span>{new Date(t.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Ticket Details */}
+        <div className="lg:col-span-2 rounded-xl border border-border bg-[#13161C] flex flex-col h-[70vh]">
+          {selectedTicket ? (
+            <>
+              <div className="p-5 border-b border-gray-800">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-white">{selectedTicket.title}</h2>
+                    <div className="text-xs text-gray-400 mt-1">From: {selectedTicket.companyId?.name} ({selectedTicket.createdBy?.email})</div>
+                  </div>
+                  <Select value={selectedTicket.status} onValueChange={updateStatus}>
+                    <SelectTrigger className="w-[140px] bg-gray-900 border-gray-700 h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Open">Open</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Resolved">Resolved</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="p-4 rounded-lg bg-gray-900/50 text-sm text-gray-300 whitespace-pre-wrap border border-gray-800">
+                  {selectedTicket.description}
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {selectedTicket.replies?.map((r: any, idx: number) => {
+                  const isSuperAdmin = r.senderModel === "SuperAdmin";
+                  return (
+                    <div key={idx} className={`flex ${isSuperAdmin ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[80%] rounded-xl p-3 text-sm ${isSuperAdmin ? "bg-cyan-600/20 text-cyan-50 border border-cyan-500/30 rounded-tr-none" : "bg-gray-800 text-gray-200 border border-gray-700 rounded-tl-none"}`}>
+                        <div className="font-semibold text-xs mb-1 opacity-70">
+                          {isSuperAdmin ? "You (Support)" : "Customer"}
+                        </div>
+                        <div className="whitespace-pre-wrap">{r.message}</div>
+                        <div className="text-[10px] mt-2 opacity-50 text-right">
+                          {new Date(r.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="p-4 border-t border-gray-800 bg-gray-900/30 gap-2 flex items-stretch">
+                <textarea
+                  placeholder="Type your reply to the customer..."
+                  className="flex-1 min-h-[40px] max-h-[120px] bg-gray-900 border border-gray-700 rounded-md p-2 text-sm text-white focus:outline-none focus:border-cyan-500 resize-y"
+                  value={replyMsg}
+                  onChange={(e) => setReplyMsg(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleReply();
+                    }
+                  }}
+                />
+                <Button onClick={handleReply} className="h-auto bg-cyan-600 hover:bg-cyan-500">Reply</Button>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-500 p-8 text-center">
+              <LifeBuoy size={48} className="mb-4 opacity-20" />
+              <p>Select a ticket to view conversation</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
