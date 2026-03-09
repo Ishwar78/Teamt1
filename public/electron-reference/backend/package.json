@@ -3,17 +3,25 @@
   "version": "1.0.0",
   "description": "TeamTreck Monitoring Platform — Express.js API Server",
   "main": "dist/index.js",
+
   "scripts": {
     "seed:super": "tsx src/scripts/seedSuperAdmin.ts",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+
+    "build": "tsc --skipLibCheck",
+
     "start": "node dist/index.js",
+
     "test": "jest --forceExit --detectOpenHandles",
     "test:watch": "jest --watch",
+
     "lint": "eslint src --ext .ts",
+
     "seed": "tsx src/scripts/seed.ts",
+
     "generate:keys": "openssl genrsa -out keys/private.pem 2048 && openssl rsa -in keys/private.pem -pubout -out keys/public.pem"
   },
+
   "dependencies": {
     "@aws-sdk/client-s3": "^3.600.0",
     "@aws-sdk/s3-request-presigner": "^3.600.0",
@@ -37,6 +45,7 @@
     "winston": "^3.13.1",
     "zod": "^3.23.8"
   },
+
   "devDependencies": {
     "@types/archiver": "^7.0.0",
     "@types/bcryptjs": "^2.4.6",
@@ -55,6 +64,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.5.3"
   },
+
   "engines": {
     "node": ">=20.0.0"
   }
