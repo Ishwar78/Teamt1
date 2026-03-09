@@ -35,6 +35,8 @@ const allowedOrigins = [
   "http://localhost:8081",
   "http://localhost:8082",
   "http://localhost:3005",
+   "https://mbbsgyan.com",
+  "https://www.mbbsgyan.com",
   ...(env.CORS_ORIGIN ? env.CORS_ORIGIN.split(",").map((o) => o.trim()) : [])
 ];
 
