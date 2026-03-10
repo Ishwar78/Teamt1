@@ -288,8 +288,9 @@ function CompaniesTab() {
       toast({ title: "Success", description: "Company created successfully" });
       setAddDialog(false);
       setNewCompany({ name: "", email: "", password: "", plan: "", country: "" });
-    } catch (e) {
-      toast({ title: "Error", description: "Failed to create company", variant: "destructive" });
+    } catch (e: any) {
+      const errorMsg = e.response?.data?.message || e.message || "Failed to create company";
+      toast({ title: "Error", description: errorMsg, variant: "destructive" });
     }
   };
 
