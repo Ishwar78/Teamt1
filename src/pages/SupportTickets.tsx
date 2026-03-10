@@ -31,7 +31,7 @@ const SupportTickets = () => {
 
     const fetchTickets = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/tickets`, {
+            const res = await fetch(`${API_BASE_URL}/company/tickets`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -53,7 +53,7 @@ const SupportTickets = () => {
     const handleCreateTicket = async () => {
         if (!newTitle.trim() || !newDesc.trim()) return;
         try {
-            const res = await fetch(`${API_BASE_URL}/tickets`, {
+            const res = await fetch(`${API_BASE_URL}/company/tickets`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -79,7 +79,7 @@ const SupportTickets = () => {
     const handleReply = async () => {
         if (!replyMsg.trim() || !selectedTicket) return;
         try {
-            const res = await fetch(`${API_BASE_URL}/tickets/${selectedTicket._id}/reply`, {
+            const res = await fetch(`${API_BASE_URL}/company/tickets/${selectedTicket._id}/reply`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

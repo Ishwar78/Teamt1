@@ -187,4 +187,56 @@ router.post(
   }
 );
 
+/* ================= SUPPORT TICKETS (COMPANY VISIBLE) ================= */
+
+import { SupportTicket } from '../models/SupportTicket';
+
+router.get('/tickets', authenticate, requireRole('company_admin'), async (req, res, next) => {
+  try {
+    const tickets = await SupportTicket.find({ companyId: req.auth!.company_id })
+      .populate('createdBy', 'name email role')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: tickets });
+  } catch (err) { next(err); }
+});
+
+router.post('/tickets', authenticate, requireRole('company_admin'), async (req: any, res, next) => {
+  try {
+    const { title, description } = req.body;
+    if (!title || !description) throw new AppError('Title and description required', 400);
+
+    const ticket = await SupportTicket.create({
+      companyId: req.auth!.company_id,
+      createdBy: req.auth!.user_id,
+      title,
+      description,
+      status: 'Open',
+      replies: []
+    });
+
+    res.status(201).json({ success: true, data: ticket });
+  } catch (err) { next(err); }
+});
+
+router.post('/tickets/:id/reply', authenticate, requireRole('company_admin'), async (req: any, res, next) => {
+  try {
+    const { message } = req.body;
+    if (!message) throw new AppError('Message is required', 400);
+
+    const ticket = await SupportTicket.findOne({ _id: req.params.id, companyId: req.auth!.company_id });
+    if (!ticket) throw new AppError('Ticket not found', 404);
+
+    ticket.replies.push({
+      senderModel: 'User',
+      senderId: req.auth!.user_id,
+      message,
+      createdAt: new Date()
+    });
+
+    await ticket.save();
+    res.json({ success: true, data: ticket });
+  } catch (err) { next(err); }
+});
+
 export const companyRoutes = router;
