@@ -20,6 +20,8 @@ export const sendInvitationEmail = async (
   companyName: string
 ) => {
 
+
+  console.log("MAIL FUNCTION RUNNING");
   try {
 
     const inviteUrl = `${env.FRONTEND_URL}/signup?token=${inviteToken}`;
@@ -210,5 +212,6 @@ export const sendCompanyCreatedEmail = async (
   } catch (error) {
     console.error("Company email error:", error);
   }
+  
 
 };
