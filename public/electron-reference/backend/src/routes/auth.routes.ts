@@ -46,23 +46,23 @@ const refreshSchema = z.object({
 //   return { accessToken, refreshToken };
 // }
 
-
 function generateTokens(payload: any) {
+
   const accessToken = jwt.sign(
     { ...payload, type: "access" },
-    env.JWT_PRIVATE_KEY,
+    env.JWT_PRIVATE_KEY as string,
     {
       algorithm: "HS256",
-      expiresIn: env.JWT_ACCESS_EXPIRY || "7d",
+      expiresIn: (env.JWT_ACCESS_EXPIRY || "7d") as any
     }
   );
 
   const refreshToken = jwt.sign(
     { ...payload, type: "refresh" },
-    env.JWT_PRIVATE_KEY,
+    env.JWT_PRIVATE_KEY as string,
     {
       algorithm: "HS256",
-      expiresIn: env.JWT_REFRESH_EXPIRY || "30d",
+      expiresIn: (env.JWT_REFRESH_EXPIRY || "30d") as any
     }
   );
 

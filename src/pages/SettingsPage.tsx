@@ -14,6 +14,9 @@ import { PageGuard } from "@/components/RoleGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
 const SettingsPage = () => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -48,9 +51,14 @@ const SettingsPage = () => {
     const fetchSettings = async () => {
       if (!token) return;
       try {
-        const res = await axios.get('http://localhost:5000/api/company/details', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+
+        const res = await axios.get(`${API_BASE}/api/company/details`, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
+        // const res = await axios.get('http://localhost:5000/api/company/details', {
+        //   headers: { Authorization: `Bearer ${token}` }
+        // });
 
         if (res.data.success) {
           const c = res.data.company;
@@ -87,9 +95,14 @@ const SettingsPage = () => {
     setSaving(true);
     try {
       // 1. Update Profile
-      await axios.put('http://localhost:5000/api/company/profile', company, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+await axios.put(`${API_BASE}/api/company/profile`, company, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
+
+      // await axios.put('http://localhost:5000/api/company/profile', company, {
+      //   headers: { Authorization: `Bearer ${token}` }
+      // });
 
       // 2. Update Monitoring (Ideally separate endpoint or unified one, but for now we focus on profile as requested)
       // Note: Backend might need update to handle monitoring settings properly via API. 

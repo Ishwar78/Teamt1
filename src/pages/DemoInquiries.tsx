@@ -11,7 +11,8 @@ const { token } = useAuth();
 useEffect(() => {
   if (!token) return;
 
-  fetch("http://localhost:5000/api/super-admin/demo-inquiries", {
+  //fetch("http://localhost:5000/api/super-admin/demo-inquiries", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/super-admin/demo-inquiries`, {
     headers: {
       Authorization: `Bearer ${token}`
     }

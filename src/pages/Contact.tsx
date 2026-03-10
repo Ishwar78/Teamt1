@@ -10,6 +10,8 @@ import Footer from "@/components/Footer";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
+const API = import.meta.env.VITE_API_BASE_URL;
+
 const Contact = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -42,7 +44,7 @@ const Contact = () => {
     try {
       const name = `${formData.firstName} ${formData.lastName}`.trim();
 
-      const res = await axios.post('http://localhost:5000/api/public/book-demo', {
+const res = await axios.post(`${API}/api/public/book-demo`, {
         name,
         email: formData.email,
         phone: formData.phone,

@@ -46,7 +46,8 @@ const SignUp = () => {
     const fetchInviteDetails = async () => {
         setIsFetchingInvite(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/auth/invite/${inviteToken}`);
+            // const res = await fetch(`http://localhost:5000/api/auth/invite/${inviteToken}`);
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/invite/${inviteToken}`);
             const data = await res.json();
 
             if (!res.ok) throw new Error(data.message || "Invalid invitation");
@@ -89,13 +90,15 @@ const SignUp = () => {
         try {
             setIsLoading(true);
 
-            let url = "http://localhost:5000/api/company/register";
+            // let url = "http://localhost:5000/api/company/register";
+            let url = `${import.meta.env.VITE_API_BASE_URL}/api/company/register`;
             let body: any = {};
 
             if (inviteToken) {
                 // Determine endpoint for accepting invite
                 // Assuming existing endpoint /api/auth/accept-invite handles this
-                url = "http://localhost:5000/api/auth/accept-invite";
+                // url = "http://localhost:5000/api/auth/accept-invite";
+                url = `${import.meta.env.VITE_API_BASE_URL}/api/auth/accept-invite`;
                 body = {
                     token: inviteToken,
                     name: formData.name,

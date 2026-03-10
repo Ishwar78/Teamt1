@@ -319,11 +319,10 @@ router.get('/usage', async (req, res, next) => {
     ]);
 
     res.json({
-      success: true,
-      success: true,
-      apps: appsWithUrls,
-      urls
-    });
+  success: true,
+  apps: appsWithUrls,
+  urls
+});
 
   } catch (err) {
     next(err);

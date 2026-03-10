@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -30,16 +31,25 @@ const refreshSchema = z.object({
 
 /* ================= TOKEN GENERATION ================= */
 
-function generateTokens(payload: object) {
-  const accessToken = jwt.sign(payload, env.JWT_PRIVATE_KEY, {
-    algorithm: 'HS256',
-    expiresIn: env.JWT_ACCESS_EXPIRY || '1h',
-  });
+function generateTokens(payload: any) {
 
-  const refreshToken = jwt.sign(payload, env.JWT_PRIVATE_KEY, {
-    algorithm: 'HS256',
-    expiresIn: env.JWT_REFRESH_EXPIRY || '7d',
-  });
+  const accessToken = jwt.sign(
+    payload,
+    env.JWT_PRIVATE_KEY as string,
+    {
+      algorithm: 'HS256',
+      expiresIn: (env.JWT_ACCESS_EXPIRY || '1h') as any
+    }
+  );
+
+  const refreshToken = jwt.sign(
+    payload,
+    env.JWT_PRIVATE_KEY as string,
+    {
+      algorithm: 'HS256',
+      expiresIn: (env.JWT_REFRESH_EXPIRY || '7d') as any
+    }
+  );
 
   return { accessToken, refreshToken };
 }
@@ -51,6 +61,7 @@ router.post(
   rateLimiter,
   validate(loginSchema),
   async (req, res) => {
+
     const { email, password, device_id, device_name, os } = req.body;
 
     const user = await User.findOne({
@@ -66,12 +77,13 @@ router.post(
     /* ================= DEVICE LOGIC ================= */
 
     if (user.role !== 'super_admin') {
+
       const existingDevice = user.devices.find(
-        (d) => d.device_id === device_id
+        (d: any) => d.device_id === device_id
       );
 
       if (!existingDevice) {
-        // DEV mode me device limit skip
+
         if (
           env.NODE_ENV === 'production' &&
           user.devices.length >= 3
@@ -89,6 +101,7 @@ router.post(
           bound_at: new Date(),
           last_seen: new Date(),
         });
+
       } else {
         existingDevice.last_seen = new Date();
       }
@@ -134,14 +147,19 @@ router.post(
   '/refresh',
   validate(refreshSchema),
   async (req, res) => {
+
     const { refresh_token } = req.body;
 
     let decoded: any;
 
     try {
-      decoded = jwt.verify(refresh_token, env.JWT_PRIVATE_KEY, {
-        algorithms: ['HS256'],
-      });
+
+      decoded = jwt.verify(
+        refresh_token,
+        env.JWT_PRIVATE_KEY as string,
+        { algorithms: ['HS256'] }
+      );
+
     } catch {
       throw new AppError('Invalid refresh token', 401);
     }
@@ -167,3 +185,4 @@ router.post('/logout', authenticate, async (_req, res) => {
 });
 
 export const adminRoutes = router;
+

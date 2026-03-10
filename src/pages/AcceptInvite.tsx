@@ -20,7 +20,8 @@ import Navbar from "@/components/Navbar";
 import { toast } from "@/hooks/use-toast";
 import { ROLE_LABELS } from "@/lib/permissions";
 
-const API_URL = "http://localhost:5000/api/auth";
+
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/auth`;
 
 const AcceptInvite = () => {
   const { token } = useParams<{ token: string }>();

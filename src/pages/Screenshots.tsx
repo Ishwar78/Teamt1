@@ -15,7 +15,9 @@ import { Camera, Download, Users, Calendar } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { format } from "date-fns";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+// const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const Screenshots = () => {
   const { token, user } = useAuth();
@@ -225,8 +227,10 @@ const Screenshots = () => {
 
                 {/* IMAGE PREVIEW FIXED */}
                 <CardContent className="p-0">
-                  <img
-                    src={`${API_BASE}/api/agent/screenshots/view/${shot._id}`}
+                  {/* <img
+                    src={`${API_BASE}/api/agent/screenshots/view/${shot._id}`} */}
+                    <img
+  src={`${API_BASE}/api/agent/screenshots/view/${shot._id}?token=${token}`}
                     className="w-full h-56 object-cover cursor-pointer"
                     alt="Screenshot"
                     crossOrigin="anonymous"

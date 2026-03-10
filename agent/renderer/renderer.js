@@ -1,3 +1,5 @@
+const API_BASE = "https://teamtreck-backend.onrender.com";
+
 let token = localStorage.getItem("auth_token");
 let deviceId = localStorage.getItem("device_id");
 let isTracking = false;
@@ -5,7 +7,7 @@ let isPaused = false;
 
 let lastActivityTime = Date.now();
 let isIdle = false;
-const IDLE_LIMIT = 1 * 60 * 1000;
+const IDLE_LIMIT = 3 * 60 * 1000;
 
 if (!deviceId) {
   deviceId = crypto.randomUUID();
@@ -24,6 +26,9 @@ const liveIndicator = document.getElementById("liveIndicator");
 const dot = document.querySelector(".dot");
 const deviceText = document.getElementById("deviceText");
 const activityStatus = document.getElementById("activityStatus");
+
+
+
 
 deviceText.innerText = deviceId;
 
@@ -93,7 +98,8 @@ setInterval(() => {
     isIdle = true;
     activityStatus.classList.add("idle");
     activityStatus.innerText = "Idle";
-    setStatus("Idle detected ⚠ (1 min)", "error");
+    setStatus("Idle detected ⚠ (3 min)", "error");
+    // setStatus("Idle detected ⚠ (1 min)", "error");
   }
 }, 2000);
 
@@ -127,7 +133,9 @@ loginBtn.onclick = async () => {
   loginBtn.innerHTML = "⏳ Authenticating...";
 
   try {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
+    // const res = await fetch("http://localhost:5000/api/auth/login", {
+
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, device_id: deviceId })

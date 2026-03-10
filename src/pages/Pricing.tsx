@@ -32,9 +32,9 @@ const Pricing = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/public/plans"
-        );
+       const res = await axios.get(
+  `${import.meta.env.VITE_API_BASE_URL}/api/public/plans`
+);
         if (res.data.success) {
           setPlans(res.data.data);
         }

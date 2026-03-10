@@ -78,7 +78,7 @@ router.get('/companies', authenticate, requireRole('super_admin'), async (_req, 
       return {
         id: c._id,
         name: c.name,
-        email: admin?.email || c.subscription?.stripe_customer_id || 'N/A', // fallback
+        email: admin?.email || (c.subscription as any)?.stripe_customer_id || 'N/A', // fallback
         plan: plan.name || 'Unknown',
         users: usersCount,
         maxUsers: plan.max_users || c.max_users,

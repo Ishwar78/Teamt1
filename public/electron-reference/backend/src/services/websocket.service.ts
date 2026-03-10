@@ -24,10 +24,14 @@ export function initWebSocket(server: HTTPServer): SocketIOServer {
     if (!token) return next(new Error('Missing authentication token'));
 
     try {
-      const payload = jwt.verify(token as string, env.JWT_PUBLIC_KEY, {
-        algorithms: ['RS256'],
-      }) as any;
-
+      const payload = jwt.verify(
+  token as string,
+  env.JWT_PUBLIC_KEY as string,
+  {
+    algorithms: ['HS256']
+  }
+) as any;
+ 
       socket.auth_data = {
         user_id: payload.user_id,
         company_id: payload.company_id,

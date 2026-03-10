@@ -12,6 +12,9 @@ import { CheckCircle2, XCircle, Clock, AlertCircle } from "lucide-react";
 import axios from "axios";
 import { PageGuard } from "@/components/RoleGuard";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
 const TimeClaim = () => {
     const { token } = useAuth();
     const { toast } = useToast();
@@ -22,9 +25,13 @@ const TimeClaim = () => {
 
     const fetchClaims = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/claims/pending", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+
+            const res = await axios.get(`${API_BASE}/api/claims/pending`, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+            // const res = await axios.get("http://localhost:5000/api/claims/pending", {
+            //     headers: { Authorization: `Bearer ${token}` }
+            // });
             if (res.data.claims) setClaims(res.data.claims);
         } catch (error) {
             console.error("Failed to fetch claims", error);
@@ -39,7 +46,8 @@ const TimeClaim = () => {
 
     const handleAction = async (id: string, status: 'approved' | 'rejected', reason?: string) => {
         try {
-            await axios.put(`http://localhost:5000/api/claims/${id}/action`, {
+            // await axios.put(`http://localhost:5000/api/claims/${id}/action`, 
+                await axios.put(`${API_BASE}/api/claims/${id}/action`, {
                 status,
                 rejectionReason: reason
             }, {

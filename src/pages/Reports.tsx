@@ -10,6 +10,8 @@ import { PageGuard } from "@/components/RoleGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 const prodColor = (p: number) => p >= 90 ? "text-status-active" : p >= 80 ? "text-primary" : p >= 70 ? "text-status-idle" : "text-destructive";
 const prodBg = (p: number) => p >= 90 ? "bg-status-active" : p >= 80 ? "bg-primary" : p >= 70 ? "bg-status-idle" : "bg-destructive";
 
@@ -39,14 +41,20 @@ const Reports = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         // Fetch Summary
-        const summaryRes = await axios.get(`http://localhost:5000/api/reports/summary?period=${period}`, { headers });
+        // const summaryRes = await axios.get(`http://localhost:5000/api/reports/summary?period=${period}`, { headers });
+
+const summaryRes = await axios.get(`${API_BASE}/api/reports/summary?period=${period}`, { headers });
+
         if (summaryRes.data.success) {
           setTotals(summaryRes.data.totals);
           setWeeklyData(summaryRes.data.weekly);
         }
 
         // Fetch User Stats
-        const usersRes = await axios.get(`http://localhost:5000/api/reports/users?period=${period}`, { headers });
+        // const usersRes = await axios.get(`http://localhost:5000/api/reports/users?period=${period}`, { headers });
+
+const usersRes = await axios.get(`${API_BASE}/api/reports/users?period=${period}`, { headers });
+
         if (usersRes.data.success) {
           setUserSummaries(usersRes.data.users);
           setUsersList(["All Users", ...usersRes.data.users.map((u: any) => u.name)]);

@@ -19,6 +19,8 @@ const BookDemoModal = ({ open, setOpen }: Props) => {
     message: ""
   });
 
+  const API = import.meta.env.VITE_API_BASE_URL;
+
   const handleSubmit = async () => {
     if (!form.name || !form.email || !form.phone) {
       toast.error("Name, Email and Phone are required");
@@ -26,22 +28,21 @@ const BookDemoModal = ({ open, setOpen }: Props) => {
     }
 
     try {
-      const res = await fetch(
-        "http://localhost:5000/api/public/book-demo",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(form)
-        }
-      );
+      const res = await fetch(`${API}/api/public/book-demo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
+      });
 
       const data = await res.json();
 
-      if (data.success) {
+      if (res.ok && data.success) {
         toast.success("Demo request submitted successfully!");
+
         setOpen(false);
+
         setForm({
           name: "",
           email: "",
@@ -49,10 +50,13 @@ const BookDemoModal = ({ open, setOpen }: Props) => {
           organisation: "",
           message: ""
         });
+
       } else {
         toast.error(data.message || "Something went wrong");
       }
+
     } catch (err) {
+      console.error(err);
       toast.error("Server error");
     }
   };
@@ -106,6 +110,7 @@ const BookDemoModal = ({ open, setOpen }: Props) => {
           <Button className="w-full" onClick={handleSubmit}>
             Book Demo
           </Button>
+
         </div>
       </DialogContent>
     </Dialog>

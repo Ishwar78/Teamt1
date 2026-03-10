@@ -284,7 +284,7 @@ router.get('/attendance', authenticate, async (req: any, res, next) => {
                 }).sort({ interval_start: 1 });
 
                 if (logs.length > 0) {
-                    let lastType = null;
+                  let lastType: string | null = null;
                     let currentSegment: any = null;
 
                     logs.forEach((log: any) => {

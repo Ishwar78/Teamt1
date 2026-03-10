@@ -26,6 +26,11 @@ import {
 } from "recharts";
 import axios from "axios";
 
+
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
 // ─── Sidebar Data ───
 const superAdminMenu = [
   { icon: BarChart3, label: "Overview", path: "/super-admin" },
@@ -626,7 +631,8 @@ function AnalyticsTab() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/super-admin/analytics', {
+        const res = await axios.get(`${API_BASE}/api/super-admin/analytics`,{
+        // axios.get('http://localhost:5000/api/super-admin/analytics', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.success) {
@@ -702,7 +708,8 @@ function SettingsTab() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/super-admin/settings', {
+        const res = await axios.get(`${API_BASE}/api/super-admin/settings`,{
+        // axios.get('http://localhost:5000/api/super-admin/settings', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.success) {
@@ -722,8 +729,13 @@ function SettingsTab() {
 
   const handleSave = async () => {
     try {
-      await axios.put('http://localhost:5000/api/super-admin/settings', settings, {
-        headers: { Authorization: `Bearer ${token}` }
+
+await axios.put(`${API_BASE}/api/super-admin/settings`, settings, {
+  headers: { Authorization: `Bearer ${token}` }
+
+
+      // await axios.put('http://localhost:5000/api/super-admin/settings', settings, {
+      //   headers: { Authorization: `Bearer ${token}` }
       });
       toast({ title: "Settings Saved", description: "Platform configuration updated." });
     } catch (e) {
@@ -805,8 +817,9 @@ function DemoInquiriesTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/super-admin/demo-inquiries",
+        const res = await axios.get(`${API_BASE}/api/super-admin/demo-inquiries`,
+        // axios.get(
+        //   "http://localhost:5000/api/super-admin/demo-inquiries",
           {
             headers: { Authorization: `Bearer ${token}` }
           }
@@ -891,7 +904,9 @@ function TicketsTab() {
 
   const fetchTickets = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/super-admin/tickets", {
+      const res = await axios.get(`${API_BASE}/api/super-admin/tickets`,
+      // axios.get("http://localhost:5000/api/super-admin/tickets", 
+        {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) setTickets(res.data.data);
@@ -910,7 +925,10 @@ function TicketsTab() {
     if (!replyMsg.trim() || !selectedTicket) return;
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/super-admin/tickets/${selectedTicket._id}/reply`,
+`${API_BASE}/api/super-admin/tickets/${selectedTicket._id}/reply`,
+      // axios.post(
+      //   `http://localhost:5000/api/super-admin/tickets/${selectedTicket._id}/reply`,
+
         { message: replyMsg },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -929,7 +947,10 @@ function TicketsTab() {
     if (!selectedTicket) return;
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/super-admin/tickets/${selectedTicket._id}/status`,
+`${API_BASE}/api/super-admin/tickets/${selectedTicket._id}/status`,
+      // axios.put(
+      //   `http://localhost:5000/api/super-admin/tickets/${selectedTicket._id}/status`,
+
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );

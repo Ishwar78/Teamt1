@@ -15,7 +15,10 @@ let currentActivityScore = 100;
 
 let isPaused = false; // ✅ ADDED (Nothing Removed)
 
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "https://teamtreck-backend.onrender.com";
+
+//  const API_BASE = "http://127.0.0.1:5000";
+// const API_BASE = "https://api.mbbsgyan.com";
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -220,7 +223,7 @@ function scheduleNextScreenshot() {
   if (!sessionId || isPaused) return;
 
   const minMinutes = 2;
-  const maxMinutes = 8;
+  const maxMinutes = 6;
   const randomDelay =
     Math.floor(Math.random() * (maxMinutes - minMinutes + 1) + minMinutes) *
     60 * 1000;
@@ -252,7 +255,7 @@ ipcMain.on('start-session', async (event, data) => {
     await captureScreenshot();
     scheduleNextScreenshot();
 
-    activityInterval = setInterval(sendActivityLog, 10000);
+    activityInterval = setInterval(sendActivityLog, 15000);
 
   } catch (err) {
     console.error("Session start error:", err.response?.data || err.message);
@@ -277,7 +280,7 @@ ipcMain.on('resume-session', () => {
 
   isPaused = false;
 
-  activityInterval = setInterval(sendActivityLog, 10000);
+  activityInterval = setInterval(sendActivityLog, 15000);
   scheduleNextScreenshot();
 
   console.log("Tracking resumed");

@@ -1,4 +1,15 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+//  const API_BASE =
+//    import.meta.env.VITE_API_BASE_URL || "https://api.mbbsgyan.com:5001";
+// const API_BASE="http://localhost:5000";
+
+// const API_BASE =
+//   import.meta.env.VITE_API_BASE_URL || window.location.origin;
+
+
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://teamtreck-backend.onrender.com";
 
 export const apiFetch = async (
   url: string,

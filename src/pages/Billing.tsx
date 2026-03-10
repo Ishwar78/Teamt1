@@ -17,7 +17,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
-
+const API = import.meta.env.VITE_API_BASE_URL;
 // Interfaces for fetched data
 interface Plan {
   id: string;
@@ -85,10 +85,14 @@ const Billing = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       // 1. Fetch Company Details
-      const companyRes = await axios.get('http://localhost:5000/api/company/details', { headers });
+      const companyRes = await 
+      // axios.get('http://localhost:5000/api/company/details', { headers });
+axios.get(`${API}/api/company/details`, { headers });
+
 
       // 2. Fetch Available Plans
-      const plansRes = await axios.get('http://localhost:5000/api/public/plans');
+      const plansRes = await axios.get(`${API}/api/public/plans`);
+      //  axios.get('http://localhost:5000/api/public/plans');
 
       if (plansRes.data.success) {
         const mappedPlans = plansRes.data.data.map((p: any) => ({
@@ -137,7 +141,7 @@ const Billing = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (token) { 
       fetchCompany();
     }
   }, [token, toast]);
@@ -178,7 +182,10 @@ const Billing = () => {
   const handleUpgrade = async (plan: Plan) => {
     try {
       // 1. Get Razorpay Key
-      const keyRes = await axios.get('http://localhost:5000/api/payment/key', {
+      const keyRes = await axios.get(`${API}/api/payment/key`, {
+
+      // axios.get('http://localhost:5000/api/payment/key', {
+
         headers: { Authorization: `Bearer ${token}` }
       });
       const key = keyRes.data.key;
@@ -189,7 +196,8 @@ const Billing = () => {
       }
 
       // 2. Create Order
-      const orderRes = await axios.post('http://localhost:5000/api/payment/create-order',
+      const orderRes = await axios.post(`${API}/api/payment/create-order`,
+      //  axios.post('http://localhost:5000/api/payment/create-order',
         { planId: plan.id, companyId: user?.company_id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -211,7 +219,8 @@ const Billing = () => {
         handler: async function (response: any) {
           try {
             // 4. Verify Payment
-            await axios.post('http://localhost:5000/api/payment/verify',
+            await axios.post(`${API}/api/payment/verify`,
+            // axios.post('http://localhost:5000/api/payment/verify',
               {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,

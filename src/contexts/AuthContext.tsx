@@ -35,12 +35,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://teamtreck-backend.onrender.com";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  /* ================= RESTORE SESSION ================= */
+  /* Restore Session */
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -54,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, []);
 
-  /* ================= LOGIN ================= */
+  /* Login */
 
   const login = async (
     email: string,
@@ -62,7 +66,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loginType: "super_admin" | "company_admin"
   ) => {
     try {
-      /* 🔥 Stable Device ID Logic */
       let deviceId = localStorage.getItem("device_id");
 
       if (!deviceId) {
@@ -70,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("device_id", deviceId);
       }
 
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,8 +92,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const backendRole = data.user.role;
-
-      /* 🔐 Role Isolation */
 
       if (loginType === "super_admin" && backendRole !== "super_admin") {
         return {
@@ -126,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  /* ================= LOGOUT ================= */
+  /* Logout */
 
   const logout = () => {
     setUser(null);
