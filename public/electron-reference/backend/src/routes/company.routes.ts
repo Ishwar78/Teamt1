@@ -8,7 +8,7 @@ import { Invitation } from '../models/Invitation';
 import { Plan } from '../models/Plan';
 import { AppError } from '../utils/errors';
 import { authenticate } from '../middleware/auth';
-import { requireRole } from '../middleware/roleGuard';
+import { requireRole } from '../middleware/roleGuard'; 
 
 const router = Router();
 
@@ -176,7 +176,8 @@ router.post(
         console.log('Invite email sent successfully');
       } catch (emailErr) {
         console.error('Failed to send invite email:', emailErr);
-        // Optional: decide if we validation error or just log it
+        await Invitation.findByIdAndDelete(invitation._id);
+        throw new AppError('Failed to send invitation email. Please check your SMTP configuration.', 500);
       }
 
       res.status(201).json({ success: true, invitation });
