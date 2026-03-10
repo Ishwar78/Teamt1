@@ -143,6 +143,7 @@ export const sendInvitationEmail = async (
 
   } catch (error) {
     console.error("Email send error:", error);
+    throw error;
   }
 
 };
@@ -219,6 +220,7 @@ export const sendCompanyCreatedEmail = async (
 
   } catch (error) {
     console.error("Company email error:", error);
+    throw error;
   }
   
 
