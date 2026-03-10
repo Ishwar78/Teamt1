@@ -158,7 +158,16 @@ export const PlatformProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addCompany = async (companyData: any) => {
-    await api.post("/company", companyData);
+    // Backend expects: { name, domain, adminEmail, adminPassword, plan_name, country }
+    const payload = {
+      name: companyData.name,
+      domain: companyData.name.replace(/\s+/g, '').toLowerCase() + '.com', // mock domain based on name
+      adminEmail: companyData.email,
+      adminPassword: companyData.password,
+      plan_name: companyData.plan,
+      country: companyData.country || 'US'
+    };
+    await api.post("/company", payload);
     fetchData();
   };
 
